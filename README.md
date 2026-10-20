@@ -276,3 +276,4 @@ Gunakan akun berikut yang telah dibuat secara otomatis oleh `DatabaseSeeder`:
 
 Proyek ini dikembangkan di bawah lisensi [MIT License](https://opensource.org/licenses/MIT).
 # blitzhire_v1
+# blitzhire_v1
