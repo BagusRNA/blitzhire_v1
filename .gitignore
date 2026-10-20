@@ -1,7 +1,9 @@
-blitzhire/node_modules/
-blitzhire/vendor/
-blitzhire/.env
-blitzhire/public/hot
-blitzhire/public/storage
-.vscode/
-.idea/
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+.env
+.env.backup
+.env.production
