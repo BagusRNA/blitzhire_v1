@@ -1,0 +1,1 @@
+import{s as e,t}from"./app-DEeLkYlq.js";e();var n=t();function r({label:e,value:t,children:r,className:i=``,labelClassName:a=``,valueClassName:o=``}){return(0,n.jsxs)(`div`,{className:`info-card ${i}`,children:[e&&(0,n.jsx)(`div`,{className:`info-card-label ${a}`,children:e}),(0,n.jsx)(`div`,{className:`info-card-value ${o}`,children:t??r})]})}export{r as t};

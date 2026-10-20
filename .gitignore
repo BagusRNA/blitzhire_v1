@@ -1,0 +1,7 @@
+blitzhire/node_modules/
+blitzhire/vendor/
+blitzhire/.env
+blitzhire/public/hot
+blitzhire/public/storage
+.vscode/
+.idea/

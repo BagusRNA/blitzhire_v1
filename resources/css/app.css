@@ -1,0 +1,1721 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    /* --- Layout --- */
+    .brand-text {
+        @apply font-bold text-xl leading-tight text-gray-900 tracking-wide;
+    }
+    .page-wrapper {
+        @apply min-h-screen bg-gray-100 flex flex-col;
+    }
+    .page-header-banner {
+        @apply bg-white shadow;
+    }
+    .page-header-banner-inner {
+        @apply mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8;
+    }
+    .page-main {
+        @apply flex-grow;
+    }
+
+    /* --- Guest Layout  --- */
+    .guest-main {
+        @apply flex-grow flex flex-col items-center pt-6 sm:justify-center sm:pt-0;
+    }
+    .guest-card {
+        @apply mt-6 w-full card-base px-6 py-6 sm:max-w-md;
+    }
+
+    /* --- Navigasi --- */
+    .nav-link {
+        @apply text-sm font-semibold transition-colors;
+    }
+    .nav-link-active {
+        @apply text-orange-500 hover:text-orange-500;
+    }
+    .nav-link-inactive {
+        @apply text-gray-700 hover:text-orange-500;
+    }
+
+    /* --- Buttons --- */
+    .btn-primary {
+        @apply inline-flex items-center justify-center bg-black hover:bg-gray-800 text-white text-xs font-bold py-3 px-4 rounded text-center uppercase tracking-widest transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+    .btn-primary-sm {
+        @apply inline-flex items-center justify-center bg-black hover:bg-gray-800 text-white text-[11px] font-bold py-2 px-3.5 rounded text-center uppercase tracking-wider transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+    .btn-secondary {
+        @apply inline-flex items-center justify-center bg-white border border-gray-800 hover:bg-gray-100 text-black text-xs font-bold py-3 px-4 rounded text-center uppercase tracking-widest transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+    .btn-secondary-sm {
+        @apply inline-flex items-center justify-center bg-white border border-gray-800 hover:bg-gray-100 text-black text-[11px] font-bold py-2 px-3.5 rounded text-center uppercase tracking-wider transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+    .btn-outline {
+        @apply inline-flex items-center justify-center gap-2 border border-gray-800 bg-white hover:bg-gray-50 text-gray-900 text-xs font-bold py-2 px-3.5 rounded transition-colors;
+    }
+    .btn-danger {
+        @apply inline-flex items-center justify-center bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 px-4 rounded text-center uppercase tracking-widest transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+    .btn-ghost {
+        @apply inline-flex items-center justify-center px-4 py-2 border border-gray-800 rounded text-xs font-bold hover:bg-gray-100 transition-colors text-gray-900;
+    }
+
+    /* --- Cards & Containers (Dashboard.jsx) --- */
+    .card-base {
+        @apply border border-gray-800 rounded-lg p-5 bg-white shadow-sm;
+    }
+    .card-base-sm {
+        @apply border border-gray-800 rounded-lg p-4 bg-white shadow-sm;
+    }
+    .card-interactive {
+        @apply border rounded-lg p-4 bg-white cursor-pointer transition-all border-gray-800 hover:border-black;
+    }
+    .card-interactive-active {
+        @apply border-2 border-black rounded-lg p-4 bg-gray-50/30 shadow-sm cursor-pointer;
+    }
+    .card-header-dark {
+        @apply bg-black text-white px-5 py-3.5 flex items-center justify-between rounded-t-lg;
+    }
+    .card-header-title {
+        @apply font-bold text-xs sm:text-sm tracking-wider uppercase text-white;
+    }
+    .card-header-badge {
+        @apply border border-white px-3 py-1 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white;
+    }
+    .section-header-row {
+        @apply flex justify-between items-baseline pb-2 border-b-2 border-black mb-4;
+    }
+    .section-header-title {
+        @apply text-xl font-bold tracking-tight text-black;
+    }
+    .section-header-meta {
+        @apply text-sm font-medium text-gray-500;
+    }
+
+    /* --- Info Card (Label & Value) --- */
+    .info-card {
+        @apply border border-gray-800 rounded-lg p-3 bg-white;
+    }
+    .info-card-sm {
+        @apply border border-gray-800 rounded-lg p-2.5 bg-white;
+    }
+    .info-card-label {
+        @apply text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1;
+    }
+    .info-card-value {
+        @apply text-sm font-bold text-black;
+    }
+
+    /* --- Badges & Status Pills --- */
+    .badge-status-solid,
+    .badge-status-black {
+        @apply inline-block bg-black text-white text-[11px] font-bold px-3 py-1 rounded uppercase tracking-wider;
+    }
+    .badge-status-outline {
+        @apply inline-block border border-gray-700 bg-white text-gray-900 text-[11px] font-bold px-3 py-1 rounded uppercase tracking-wider;
+    }
+    .badge-status-success {
+        @apply inline-block bg-green-700 text-white text-[11px] font-bold px-3 py-1 rounded uppercase tracking-wider;
+    }
+    .badge-status-danger {
+        @apply inline-block border border-dashed border-red-500 text-red-600 text-[11px] font-bold px-3 py-1 rounded uppercase tracking-wider;
+    }
+    .badge-status-pill {
+        @apply inline-block bg-black text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider flex-shrink-0;
+    }
+
+    /* --- Form Inputs (Dashboard.jsx) --- */
+    .form-input-base,
+    .form-input,
+    .input-base {
+        @apply w-full text-xs border border-gray-800 rounded-md p-2.5 bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-black placeholder-gray-400 transition-colors;
+    }
+    .form-select-base,
+    .form-select,
+    .select-base {
+        @apply w-full text-xs border border-gray-800 rounded-md p-2.5 bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-black cursor-pointer transition-colors;
+    }
+    .form-textarea-base,
+    .form-textarea,
+    .textarea-base {
+        @apply w-full text-xs border border-gray-800 rounded-md p-2.5 bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-black resize-none placeholder-gray-400 transition-colors;
+    }
+    .form-label-base,
+    .form-label,
+    .label-base {
+        @apply block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1;
+    }
+    .form-error-base,
+    .form-error {
+        @apply text-xs text-red-600 mt-1;
+    }
+
+    /* --- Modals --- */
+    .modal-backdrop-dark {
+        @apply fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4;
+    }
+    .modal-card-base {
+        @apply bg-white rounded-lg border-2 border-black max-w-md w-full p-6 shadow-xl;
+    }
+    .modal-card-lg {
+        @apply bg-white rounded-lg border-2 border-black max-w-lg w-full p-6 shadow-xl;
+    }
+    .modal-header-line {
+        @apply flex justify-between items-center border-b border-gray-200 pb-3 mb-4;
+    }
+    .modal-header-title {
+        @apply text-base font-bold text-black uppercase tracking-wide;
+    }
+    .modal-header-close {
+        @apply text-gray-500 hover:text-black font-bold text-lg leading-none cursor-pointer transition-colors;
+    }
+
+    /* --- Header --- */
+    .header-container {
+        @apply sticky top-0 z-50 border-t-[3px] border-orange-500 bg-white shadow-sm;
+    }
+
+    /* --- Legacy / Breeze Aliases for Compatibility --- */
+    .btn-dark {
+        @apply inline-flex items-center justify-center rounded-md border border-transparent bg-black px-4 py-2 text-xs font-bold uppercase tracking-widest text-white transition duration-150 ease-in-out hover:bg-gray-800 focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 active:bg-gray-900;
+    }
+    .form-input {
+        @apply form-input-base;
+    }
+    .form-label {
+        @apply form-label-base;
+    }
+    .form-error {
+        @apply form-error-base;
+    }
+    .form-checkbox {
+        @apply rounded border-gray-800 text-black shadow-sm focus:ring-black;
+    }
+
+    /* --- Footer --- */
+    .footer-container {
+        @apply bg-[#0B1120] text-gray-400 py-6;
+    }
+    .footer-link,
+    .hrd-footer-link {
+        @apply hover:text-orange-400 transition-colors text-xs font-semibold tracking-wider text-gray-400;
+    }
+
+    /* --- Breeze Nav --- */
+    .breeze-nav-link {
+        @apply inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none;
+    }
+    .breeze-nav-link-active {
+        @apply border-indigo-400 text-gray-900 focus:border-indigo-700;
+    }
+    .breeze-nav-link-inactive {
+        @apply border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 focus:border-gray-300 focus:text-gray-700;
+    }
+
+    /* --- Auth Pages --- */
+    .auth-link {
+        @apply rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
+    }
+    .auth-status {
+        @apply mb-4 text-sm font-medium text-green-600;
+    }
+    .page-title {
+        @apply text-xl font-semibold leading-tight text-gray-800;
+    }
+
+    /* --- Card / Content --- */
+    .content-card {
+        @apply overflow-hidden bg-white shadow-sm sm:rounded-lg;
+    }
+    .content-card-body {
+        @apply p-6 text-gray-900;
+    }
+    .section-wrapper {
+        @apply py-12;
+    }
+    .section-inner {
+        @apply mx-auto max-w-7xl sm:px-6 lg:px-8;
+    }
+
+    /* --- Custom Auth Pages (HRD & Pelamar Login/Register) --- */
+    .auth-page-dark {
+        @apply min-h-screen bg-gray-50 flex items-center justify-center p-4;
+    }
+    .auth-page-light {
+        @apply min-h-screen bg-gray-50 flex items-center justify-center p-4;
+    }
+    .auth-page-light-tall {
+        @apply min-h-screen bg-gray-50 py-12 flex items-center justify-center p-4;
+    }
+    .auth-card-dark {
+        @apply card-base p-8 w-full max-w-md bg-white shadow-sm;
+    }
+    .auth-card-light {
+        @apply card-base p-8 w-full shadow-sm;
+    }
+    .auth-brand-dark {
+        @apply text-3xl font-extrabold text-black tracking-tight;
+    }
+    .auth-brand-light {
+        @apply text-3xl font-extrabold text-black tracking-tight;
+    }
+    .auth-input-dark {
+        @apply form-input-base;
+    }
+    .auth-input-light {
+        @apply form-input-base;
+    }
+    .auth-btn-dark {
+        @apply btn-primary w-full py-3;
+    }
+    .auth-btn-light {
+        @apply btn-primary w-full py-3;
+    }
+    .auth-label-dark {
+        @apply form-label-base;
+    }
+    .auth-label-light {
+        @apply form-label-base;
+    }
+    .auth-status-dark {
+        @apply mb-4 p-3 bg-gray-100 border border-gray-800 text-black rounded text-xs font-bold uppercase tracking-wider;
+    }
+    .flash-success,
+    .hrd-flash-success,
+    .auth-status-light {
+        @apply mb-4 p-3 bg-green-50 text-green-700 rounded-lg border border-green-200 text-sm font-medium;
+    }
+    .flash-error {
+        @apply mb-4 p-3 bg-red-50 text-red-700 rounded-lg border border-red-200 text-sm font-medium;
+    }
+
+    /* --- Custom Dashboard Pages (HRD & Pelamar) --- */
+    .dashboard-wrapper {
+        @apply min-h-screen bg-slate-50;
+    }
+    .dashboard-header {
+        @apply bg-white border-b border-gray-200 px-8 py-5 shadow-sm;
+    }
+    .dashboard-title {
+        @apply text-2xl font-bold text-gray-900;
+    }
+    .dashboard-main {
+        @apply max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8;
+    }
+
+    /* --- Unified Data Table Components --- */
+    .data-table-wrapper,
+    .hrd-table-section,
+    .hrd-data-table-wrap {
+        @apply bg-white border border-gray-200 rounded shadow-sm overflow-x-auto;
+    }
+    .hrd-table-section-label {
+        @apply text-[10px] font-bold text-gray-500 tracking-widest uppercase px-5 py-3 border-b border-gray-100;
+    }
+    .data-table,
+    .hrd-table {
+        @apply w-full text-left border-collapse text-sm;
+    }
+    .data-table-head,
+    .hrd-table-head {
+        @apply bg-gray-50 border-b border-gray-200;
+    }
+    .data-table-th,
+    .hrd-table-th {
+        @apply px-5 py-3 text-xs font-bold text-gray-600 uppercase tracking-wider;
+    }
+    .data-table-body,
+    .hrd-table-body {
+        @apply divide-y divide-gray-100;
+    }
+    .data-table-tr,
+    .hrd-table-tr {
+        @apply border-b border-gray-100 hover:bg-gray-50/60 transition-colors;
+    }
+    .data-table-td,
+    .hrd-table-td {
+        @apply px-5 py-3.5 text-gray-800 text-xs;
+    }
+    .hrd-table-ref {
+        @apply font-mono text-xs text-gray-500;
+    }
+    .hrd-table-name {
+        @apply font-semibold text-gray-900;
+    }
+    .data-table-empty,
+    .hrd-table-empty {
+        @apply text-center py-8 text-gray-400 text-xs;
+    }
+
+    /* --- BADGE / STATUS --- */
+    .badge-review {
+        @apply px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700;
+    }
+    .badge-green {
+        @apply px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700;
+    }
+
+    /* --- Modal Overlay --- */
+    .modal-overlay {
+        @apply fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4;
+    }
+    .modal-card {
+        @apply bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl;
+    }
+    .modal-title {
+        @apply text-2xl font-bold text-gray-900;
+    }
+
+    /* --- Jobs Page --- */
+    .jobs-page-wrapper {
+        @apply min-h-screen flex flex-col bg-gray-50;
+    }
+    .jobs-main {
+        @apply flex-grow max-w-7xl mx-auto py-12 px-6 w-full;
+    }
+    .jobs-search-input {
+        @apply w-full md:w-[380px] border border-gray-800 rounded-md px-4 py-2.5 text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-black;
+    }
+    .jobs-select {
+        @apply w-full md:w-[180px] border border-gray-800 rounded-md px-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-black cursor-pointer;
+    }
+    .jobs-search-btn {
+        @apply w-full md:w-auto inline-flex items-center justify-center bg-black hover:bg-gray-800 text-white text-xs font-bold py-3 px-6 rounded-md uppercase tracking-wider transition-colors;
+    }
+    .jobs-card {
+        @apply card-base p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 transition-all hover:border-black;
+    }
+    .jobs-initial-box {
+        @apply w-12 h-12 rounded border border-gray-800 bg-gray-100 flex items-center justify-center text-lg font-bold text-gray-900 flex-shrink-0;
+    }
+    .jobs-type-badge {
+        @apply inline-block bg-black text-white text-[11px] font-bold px-2.5 py-0.5 rounded uppercase tracking-wider;
+    }
+    .jobs-detail-btn {
+        @apply inline-flex items-center justify-center border border-gray-800 bg-white hover:bg-gray-100 text-black text-xs font-bold px-4 py-2.5 rounded uppercase tracking-wider transition-colors;
+    }
+    .jobs-empty {
+        @apply bg-white rounded-lg border border-dashed border-gray-800 py-12 text-center text-gray-500 text-sm font-medium;
+    }
+    .jobs-filter-chip {
+        @apply px-3.5 py-1.5 rounded text-xs font-bold uppercase tracking-wider border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition;
+    }
+    .jobs-filter-chip--active {
+        @apply bg-black text-white border-black hover:bg-gray-800;
+    }
+
+    /* --- Landing Page --- */
+    .landing-wrapper {
+        @apply min-h-screen bg-white font-sans text-gray-900 flex flex-col justify-between;
+    }
+    .landing-main {
+        @apply flex-1;
+    }
+    .landing-hero-section {
+        @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-12 sm:pb-16;
+    }
+    .landing-hero-grid {
+        @apply grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center;
+    }
+    .landing-hero-left {
+        @apply lg:col-span-7 flex flex-col justify-center;
+    }
+    .landing-eyebrow {
+        @apply text-xs font-bold tracking-widest text-gray-500 uppercase mb-3;
+    }
+    .landing-hero-title {
+        @apply text-3xl sm:text-5xl lg:text-[54px] font-extrabold text-black tracking-tight leading-[1.15] mb-5;
+    }
+    .landing-hero-desc {
+        @apply text-xs sm:text-sm text-gray-600 leading-relaxed text-justify mb-8 max-w-2xl;
+    }
+    .landing-btn-group {
+        @apply flex flex-wrap items-center gap-3 sm:gap-4 mb-9;
+    }
+    .landing-btn-primary {
+        @apply inline-flex items-center justify-center gap-2 bg-black hover:bg-neutral-800 text-white font-extrabold px-6 py-2.5 rounded-sm sm:rounded-md text-xs sm:text-sm tracking-wider uppercase transition-colors;
+    }
+    .landing-btn-outline {
+        @apply inline-flex items-center justify-center border border-black bg-white hover:bg-gray-100 text-black font-extrabold px-6 py-2.5 rounded-sm sm:rounded-md text-xs sm:text-sm tracking-wider uppercase transition-colors;
+    }
+    .landing-stats-row {
+        @apply flex flex-wrap items-center gap-6 sm:gap-10 pt-2;
+    }
+    .landing-stat-item {
+        @apply flex items-stretch gap-2.5;
+    }
+    .landing-stat-divider {
+        @apply w-[3px] bg-black;
+    }
+    .landing-stat-val {
+        @apply font-extrabold text-base sm:text-lg text-black leading-tight;
+    }
+    .landing-stat-lbl {
+        @apply text-[9px] sm:text-[10px] text-gray-500 font-semibold tracking-wider uppercase;
+    }
+    .landing-hero-right {
+        @apply lg:col-span-5 flex items-center justify-center;
+    }
+    .landing-hero-img-box {
+        @apply w-full max-w-lg lg:max-w-none overflow-hidden rounded-2xl sm:rounded-3xl shadow-sm border border-gray-200;
+    }
+    .landing-hero-img {
+        @apply w-full h-auto object-cover aspect-[4/3] block;
+    }
+
+    .landing-process-section {
+        @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14;
+    }
+    .landing-section-header {
+        @apply text-center mb-8 sm:mb-10;
+    }
+    .landing-section-eyebrow {
+        @apply text-[11px] sm:text-xs font-bold tracking-widest text-gray-500 uppercase block mb-1;
+    }
+    .landing-section-title {
+        @apply text-2xl sm:text-3xl font-extrabold text-black tracking-tight;
+    }
+    .landing-title-underline {
+        @apply w-16 sm:w-20 h-[3px] bg-black mx-auto mt-2;
+    }
+    .landing-process-grid {
+        @apply grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8;
+    }
+    .landing-process-card {
+        @apply border border-black rounded-lg p-6 sm:p-7 bg-white flex flex-col justify-between hover:shadow-md transition-shadow;
+    }
+    .landing-process-badge {
+        @apply w-7 h-7 sm:w-8 sm:h-8 bg-black text-white flex items-center justify-center font-extrabold text-sm sm:text-base mb-4;
+    }
+    .landing-process-card-title {
+        @apply text-base sm:text-lg font-extrabold text-black mb-3;
+    }
+    .landing-process-card-desc {
+        @apply text-xs sm:text-[13px] text-gray-600 leading-relaxed text-justify;
+    }
+
+    .landing-roles-section {
+        @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 mb-8 sm:mb-12;
+    }
+    .landing-roles-topbar {
+        @apply flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6;
+    }
+    .landing-roles-title {
+        @apply text-xl sm:text-2xl font-extrabold text-black tracking-tight;
+    }
+    .landing-roles-desc,
+    .landing-role-info {
+        @apply text-xs sm:text-sm text-gray-600 mt-1;
+    }
+    .landing-roles-btn {
+        @apply inline-flex items-center justify-center gap-2 bg-black hover:bg-neutral-800 text-white font-extrabold px-6 py-2.5 rounded-sm sm:rounded-md text-xs sm:text-sm tracking-wider uppercase transition-colors shrink-0 self-start md:self-auto;
+    }
+    .landing-btn-arrow {
+        @apply text-base leading-none;
+    }
+    .landing-roles-grid {
+        @apply grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6;
+    }
+    .landing-role-card {
+        @apply border border-black rounded-lg p-5 sm:p-6 bg-white flex items-start sm:items-center gap-4 hover:shadow-md transition-shadow;
+    }
+    .landing-role-icon-box {
+        @apply w-12 h-12 border-2 border-black flex items-center justify-center flex-shrink-0;
+    }
+    .landing-role-icon-box--solid {
+        @apply p-1.5;
+    }
+    .landing-role-icon-box--outline {
+        @apply p-2;
+    }
+    .landing-role-icon-inner-solid {
+        @apply w-full h-full bg-black;
+    }
+    .landing-role-icon-inner-outline {
+        @apply w-full h-full border-2 border-black;
+    }
+    .landing-role-body {
+        @apply flex-1 min-w-0;
+    }
+    .landing-role-header {
+        @apply flex flex-wrap items-center gap-3;
+    }
+    .landing-role-name {
+        @apply text-base sm:text-lg font-extrabold text-black hover:text-neutral-800;
+    }
+    .landing-role-badge-solid {
+        @apply bg-black text-white text-[11px] sm:text-xs font-bold px-3 py-0.5 rounded tracking-wider uppercase;
+    }
+    .landing-role-badge-outline {
+        @apply border border-black bg-white text-black text-[11px] sm:text-xs font-bold px-3 py-0.5 rounded tracking-wider uppercase;
+    }
+
+    /* --- Profile --- */
+    .profile-section-card {
+        @apply card-base p-6 sm:p-8;
+    }
+    .profile-section-title {
+        @apply text-lg font-medium text-gray-900;
+    }
+    .profile-section-desc {
+        @apply mt-1 text-sm text-gray-600;
+    }
+
+    /* --- FORGOT / RESET PASSWORD PAGES --- */
+    .auth-standalone-page {
+        @apply min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8;
+    }
+    .auth-standalone-card {
+        @apply card-base py-8 px-6 sm:px-10 bg-white shadow-sm;
+    }
+    .auth-standalone-btn {
+        @apply btn-primary w-full py-3;
+    }
+    .auth-standalone-input {
+        @apply form-input-base;
+    }
+
+    /* ================================================
+       HRD SHELL — Sidebar + Topbar Layout
+       ================================================ */
+    .hrd-shell {
+        @apply flex min-h-screen bg-gray-50;
+    }
+
+    /* Sidebar */
+    .hrd-sidebar {
+        @apply w-44 min-h-screen bg-white border-r border-gray-200 flex flex-col flex-shrink-0 shadow-sm;
+    }
+
+    /* 1. Logo di atas sidebar */
+    .hrd-sidebar-logo {
+        @apply flex items-center gap-2 px-3 py-4 border-b border-gray-100;
+    }
+    .hrd-sidebar-logo-text,
+    .hrd-topbar-brand-text,
+    .portal-brand-text {
+        @apply flex flex-col text-sm font-bold leading-tight text-gray-900;
+    }
+
+    /* 2. Avatar + email */
+    .hrd-sidebar-user {
+        @apply flex items-center gap-2 px-3 py-3 border-b border-gray-100;
+    }
+    .hrd-sidebar-avatar {
+        @apply w-9 h-9 flex-shrink-0 rounded border border-gray-300 bg-gray-50;
+    }
+    .hrd-sidebar-email {
+        @apply text-[10px] text-gray-500 leading-tight break-all;
+    }
+
+    /* 3. Nav */
+    .hrd-sidebar-nav {
+        @apply flex flex-col gap-0 flex-grow mt-1;
+    }
+    .hrd-nav-item {
+        @apply block text-center text-sm font-medium py-3 px-2 text-gray-700 border border-gray-200 mx-2 my-1 rounded hover:bg-gray-100 transition-colors;
+    }
+    .hrd-nav-item--active {
+        @apply bg-gray-900 text-white border-gray-900 hover:bg-gray-800;
+    }
+    .hrd-sidebar-footer {
+        @apply p-3 border-t border-gray-100;
+    }
+    .hrd-logout-btn {
+        @apply w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 px-3 rounded transition-colors;
+    }
+
+    /* Main Area (right of sidebar) */
+    .hrd-main-area {
+        @apply flex flex-col flex-1 min-w-0;
+    }
+
+    /* Top Header */
+    .hrd-topbar {
+        @apply flex items-center justify-between px-6 py-3 bg-white border-b border-t-[3px] border-t-orange-500 border-b-gray-200 shadow-sm sticky top-0 z-40;
+    }
+    .hrd-topbar-brand {
+        @apply flex items-center gap-2;
+    }
+    .hrd-topbar-nav {
+        @apply flex items-center gap-6;
+    }
+    .hrd-topbar-link {
+        @apply text-sm font-semibold text-gray-600 hover:text-orange-500 transition-colors;
+    }
+    .hrd-topbar-link--active {
+        @apply text-orange-500;
+    }
+    .portal-user-badge,
+    .hrd-topbar-user {
+        @apply flex items-center gap-2 border border-gray-400 rounded px-3 py-1.5 text-sm font-medium text-gray-700 bg-white;
+    }
+    .portal-user-badge-icon,
+    .hrd-topbar-user-icon {
+        @apply w-5 h-5 rounded-sm border border-gray-400 bg-gray-100 flex-shrink-0;
+    }
+
+    /* Content area */
+    .hrd-content {
+        @apply flex-1 p-6;
+    }
+
+    /* Footer */
+    .portal-footer,
+    .hrd-footer {
+        @apply bg-[#1C2434] text-gray-400 py-3.5 px-6 border-t border-gray-800;
+    }
+    .portal-footer-inner,
+    .hrd-footer-inner {
+        @apply flex justify-between items-center text-xs;
+    }
+
+    /* ================================================
+       HRD PAGE CONTENT COMPONENTS
+       ================================================ */
+    .hrd-page-section {
+        @apply max-w-full;
+    }
+    .hrd-section-label {
+        @apply text-xs font-bold text-gray-500 tracking-widest border-b border-gray-200 pb-2 mb-4;
+    }
+    .hrd-flash-success {
+        @apply mb-4 p-3 bg-green-50 text-green-700 rounded-lg border border-green-200 text-sm;
+    }
+
+    /* --- STATS CARDS (Dashboard) --- */
+    .hrd-stats-grid {
+        @apply grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6;
+    }
+    .hrd-stat-card {
+        @apply card-base p-5;
+    }
+    .hrd-stat-label {
+        @apply text-[10px] font-bold text-gray-500 tracking-widest uppercase mb-1;
+    }
+    .hrd-stat-value {
+        @apply text-4xl font-black text-gray-900 leading-none my-2;
+    }
+    .hrd-stat-x {
+        @apply text-2xl font-black text-gray-400 ml-0.5;
+    }
+    .hrd-stat-sub {
+        @apply text-xs text-gray-500;
+    }
+
+    .hrd-ats-badge {
+        @apply inline-block border border-dashed border-gray-400 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded;
+    }
+    .hrd-open-details-link {
+        @apply text-black text-xs font-bold hover:underline transition-colors;
+    }
+
+    /* --- FILTER BAR (Manajemen Kandidat) --- */
+    .hrd-filter-bar {
+        @apply flex flex-wrap items-center gap-2 mb-4;
+    }
+    .hrd-filter-label {
+        @apply text-xs font-bold text-gray-600 tracking-wider;
+    }
+    .hrd-filter-dropdown-btn {
+        @apply border border-gray-300 text-gray-700 text-xs font-medium px-3 py-1.5 rounded hover:bg-gray-50 transition-colors flex items-center gap-1;
+    }
+    .hrd-filter-chip {
+        @apply border border-gray-300 text-gray-700 text-xs font-medium px-4 py-1.5 rounded hover:bg-gray-100 transition-colors;
+    }
+    .hrd-filter-chip--active {
+        @apply bg-black border-black text-white hover:bg-gray-800;
+    }
+
+    /* --- KANBAN BOARD (Manajemen Kandidat) --- */
+    .hrd-kanban-wrapper {
+        @apply overflow-x-auto pb-2;
+    }
+    .hrd-kanban-board {
+        @apply flex gap-3 min-w-max;
+    }
+    .hrd-kanban-col {
+        @apply bg-white border border-gray-300 rounded shadow-sm flex flex-col;
+        min-width: 220px;
+        width: 220px;
+    }
+    .hrd-kanban-col-header {
+        @apply bg-gray-900 text-white flex justify-between items-center px-3 py-2 flex-shrink-0;
+    }
+    .hrd-kanban-col-title {
+        @apply text-[10px] font-bold tracking-widest uppercase;
+    }
+    .hrd-kanban-col-count {
+        @apply bg-white text-gray-900 text-xs font-bold w-5 h-5 rounded-sm flex items-center justify-center flex-shrink-0;
+    }
+    .hrd-kanban-cards {
+        @apply flex flex-col divide-y divide-gray-100 overflow-y-auto;
+        max-height: calc(100vh - 220px);
+    }
+    .hrd-kanban-empty {
+        @apply text-center text-gray-400 text-xs py-8 px-3;
+    }
+    .hrd-kanban-card {
+        @apply p-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0;
+    }
+    .hrd-kcard-name {
+        @apply font-bold text-gray-900 text-sm leading-tight;
+    }
+    .hrd-kcard-posisi {
+        @apply text-xs text-gray-500 mt-0.5 mb-2;
+    }
+    .hrd-kcard-ats {
+        @apply mb-2;
+    }
+    .hrd-ats-badge-sm {
+        @apply inline-block border border-dashed border-gray-400 text-gray-600 text-[11px] font-semibold px-2 py-0.5 rounded;
+    }
+    .hrd-kcard-footer {
+        @apply flex items-center justify-between gap-1 mt-1;
+    }
+    .hrd-kcard-meta {
+        @apply text-[10px] text-gray-500 truncate max-w-[100px];
+    }
+    .hrd-kcard-review-link {
+        @apply text-[10px] text-gray-500 hover:text-orange-500 transition-colors whitespace-nowrap underline-offset-1 hover:underline;
+    }
+    .hrd-status-badge {
+        @apply text-[10px] font-bold px-2 py-0.5 rounded;
+    }
+    .hrd-badge-hired {
+        @apply bg-gray-900 text-white;
+    }
+    .hrd-badge-rejected {
+        @apply border border-gray-900 bg-white text-gray-900;
+    }
+    .hrd-badge-pending {
+        @apply bg-yellow-100 text-yellow-700 border border-yellow-300;
+    }
+
+    /* --- MANAJEMEN DATA --- */
+    .hrd-data-toolbar {
+        @apply flex flex-wrap items-center justify-between gap-3 mb-4;
+    }
+    .hrd-data-toolbar-left {
+        @apply flex flex-wrap gap-2;
+    }
+    .hrd-data-toolbar-right {
+        @apply flex flex-wrap gap-2 items-center;
+    }
+    .hrd-laporan-btn {
+        @apply btn-secondary-sm py-2 px-3;
+    }
+    .hrd-filter-select {
+        @apply border border-gray-800 text-black text-xs font-bold px-3 py-1.5 rounded bg-white focus:outline-none focus:ring-1 focus:ring-black;
+    }
+    .hrd-filter-apply-btn {
+        @apply btn-primary-sm py-2 px-4;
+    }
+    .hrd-doc-list {
+        @apply flex flex-col gap-0.5;
+    }
+    .hrd-doc-link {
+        @apply flex items-center gap-1 text-blue-600 hover:underline text-xs;
+    }
+    .hrd-doc-icon {
+        @apply inline-block bg-gray-100 border border-gray-300 text-[9px] font-bold px-1 rounded text-gray-600;
+    }
+    .hrd-checkbox {
+        @apply rounded border-gray-300 text-orange-500 focus:ring-orange-400;
+    }
+    .hrd-delete-btn {
+        @apply text-lg hover:text-red-500 transition-colors;
+    }
+    .hrd-status-pill {
+        @apply inline-block text-xs font-medium px-2.5 py-0.5 rounded-full;
+    }
+    .hrd-status-diterima {
+        @apply bg-green-100 text-green-700;
+    }
+    .hrd-status-ditolak {
+        @apply bg-red-100 text-red-700;
+    }
+    .hrd-status-screening {
+        @apply bg-amber-100 text-amber-700;
+    }
+    .hrd-status-wawancara,
+    .hrd-status-interview {
+        @apply bg-purple-100 text-purple-700;
+    }
+    .hrd-status-penawaran,
+    .hrd-status-offer {
+        @apply bg-blue-100 text-blue-700;
+    }
+    .hrd-view-toggle-btn {
+        @apply text-xs font-medium border border-gray-300 px-3 py-1.5 rounded text-gray-600 hover:bg-gray-50 transition-colors;
+    }
+    .hrd-view-toggle-btn--active {
+        @apply bg-gray-900 text-white border-gray-900;
+    }
+
+    /* --- SCHEDULE BUTTON on kanban card --- */
+    .hrd-kcard-schedule-btn {
+        @apply w-full mt-2 block text-[10px] font-bold uppercase tracking-wider text-black border border-gray-800 rounded py-2.5 px-2 hover:bg-black hover:text-white transition-colors text-center leading-none;
+    }
+
+    /* --- SCHEDULE INTERVIEW MODAL --- */
+    .hrd-schedule-modal {
+        @apply bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden;
+    }
+    .hrd-smodal-header {
+        @apply flex items-start justify-between px-6 pt-6 pb-4;
+    }
+    .hrd-smodal-title {
+        @apply text-xl font-bold text-gray-900;
+    }
+    .hrd-smodal-subtitle {
+        @apply text-sm text-gray-500 mt-0.5;
+    }
+    .hrd-smodal-close {
+        @apply text-gray-400 hover:text-gray-700 text-lg leading-none transition-colors;
+    }
+    .hrd-smodal-body {
+        @apply px-6 pb-6 flex flex-col gap-4;
+    }
+    .hrd-smodal-field {
+        @apply flex flex-col gap-1;
+    }
+    .hrd-smodal-row {
+        @apply grid grid-cols-2 gap-3;
+    }
+    .hrd-smodal-label {
+        @apply text-sm font-semibold text-gray-700;
+    }
+    .hrd-smodal-input {
+        @apply w-full px-3 py-2.5 border border-gray-800 rounded text-sm text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-black transition;
+    }
+    .hrd-smodal-input--error {
+        @apply border-red-400 focus:ring-red-400;
+    }
+    .hrd-smodal-textarea {
+        @apply resize-none;
+    }
+    .hrd-smodal-error {
+        @apply text-xs text-red-500;
+    }
+    .hrd-smodal-actions {
+        @apply flex justify-end gap-3 pt-2 border-t border-gray-100;
+    }
+    .hrd-smodal-cancel-btn {
+        @apply px-5 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors;
+    }
+    .hrd-smodal-confirm-btn {
+        @apply px-5 py-2.5 text-sm font-bold text-white bg-black rounded hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+
+    /* --- HRD: Kelola Job & konfigurasi editor --- */
+    .hrd-jobpage-header {
+        @apply flex items-center justify-between gap-4 border-b border-gray-300 pb-3;
+    }
+    .hrd-page-main-title {
+        @apply text-2xl font-extrabold uppercase tracking-tight text-gray-900;
+    }
+    .hrd-job-create-btn {
+        @apply inline-flex items-center justify-center border border-gray-800 bg-black text-white px-5 py-3 text-xs font-black uppercase tracking-wider hover:bg-gray-800 transition-colors;
+    }
+
+    .hrd-config-page {
+        @apply flex flex-col gap-5;
+    }
+    .hrd-config-section {
+        @apply border border-gray-300 bg-white p-4;
+    }
+    .hrd-config-header {
+        @apply flex items-center justify-between gap-4 border-b border-gray-300 pb-3 mb-4;
+    }
+    .hrd-config-title {
+        @apply text-lg font-black uppercase tracking-tight text-gray-900;
+    }
+    .hrd-config-row {
+        @apply flex items-center justify-between gap-4 py-2 border-b border-gray-200 last:border-b-0;
+    }
+    .hrd-config-label {
+        @apply text-lg font-semibold text-gray-900;
+    }
+    .hrd-config-value {
+        @apply text-3xl font-black text-gray-900;
+    }
+    .hrd-config-percent {
+        @apply text-xs font-bold uppercase tracking-widest text-gray-500;
+    }
+    .hrd-config-input-wrap {
+        @apply flex flex-col gap-3;
+    }
+    .hrd-config-pill-row {
+        @apply flex flex-wrap items-center gap-2;
+    }
+    .hrd-config-chip {
+        @apply border border-gray-300 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wider text-gray-700 hover:bg-gray-100 transition-colors;
+    }
+    .hrd-config-chip--active {
+        @apply bg-black text-white border-black;
+    }
+    .hrd-config-add-btn {
+        @apply border border-gray-300 bg-gray-100 px-4 py-2 text-sm font-bold text-gray-800 hover:bg-gray-200 transition-colors;
+    }
+    .hrd-config-swatch {
+        @apply flex items-center gap-2; 
+    }
+    .hrd-config-swatch-box {
+        @apply h-5 w-5 border border-gray-400 bg-gray-100;
+    }
+
+    .hrd-edit-shell {
+        @apply flex flex-col gap-4;
+    }
+    .hrd-edit-header {
+        @apply flex items-center justify-between gap-3 border-b border-gray-300 pb-3;
+    }
+    .hrd-edit-stepper {
+        @apply flex items-center justify-between gap-4 mt-4;
+    }
+    .hrd-edit-step {
+        @apply flex flex-1 items-center gap-3;
+    }
+    .hrd-edit-step-box {
+        @apply flex h-10 w-10 items-center justify-center border border-gray-400 bg-white text-lg font-bold text-gray-900;
+    }
+    .hrd-edit-step-box--active {
+        @apply border-0 bg-black text-white;
+    }
+    .hrd-edit-step-label {
+        @apply text-center text-sm font-bold uppercase tracking-tight text-gray-900;
+    }
+    .hrd-edit-step-line {
+        @apply h-px flex-1 bg-gray-300;
+    }
+    .hrd-edit-form {
+        @apply mt-6 border border-gray-300 bg-white p-6;
+    }
+    .hrd-edit-form-title {
+        @apply mb-5 text-2xl font-black uppercase tracking-tight text-gray-900;
+    }
+    .hrd-form-grid {
+        @apply grid grid-cols-1 md:grid-cols-2 gap-5;
+    }
+    .hrd-form-field {
+        @apply flex flex-col gap-2;
+    }
+    .hrd-form-field--wide {
+        @apply md:col-span-2;
+    }
+    .hrd-form-label {
+        @apply text-base font-bold text-gray-900;
+    }
+    .hrd-form-input,
+    .hrd-form-select {
+        @apply w-full border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-black;
+    }
+    .hrd-form-row {
+        @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+    }
+    .hrd-choice-row {
+        @apply flex flex-wrap gap-3 mt-2;
+    }
+    .hrd-choice-btn {
+        @apply border border-gray-300 bg-white px-6 py-3 text-base font-bold uppercase tracking-wider text-gray-900 hover:bg-gray-100 transition-colors;
+    }
+    .hrd-choice-btn--active {
+        @apply border-0 bg-black text-white;
+    }
+    .hrd-form-footer {
+        @apply mt-6 flex items-center justify-between gap-4 border-t border-gray-300 pt-5;
+    }
+    .hrd-back-btn,
+    .hrd-next-btn {
+        @apply inline-flex items-center justify-center border border-gray-300 bg-white px-5 py-3 text-base font-black uppercase tracking-wider text-gray-900 hover:bg-gray-100 transition-colors;
+    }
+    .hrd-next-btn {
+        @apply border-0 bg-black text-white hover:bg-gray-800;
+    }
+
+    /* ===================================================
+       KELOLA JOB (Image 4)
+       =================================================== */
+    .hrd-jobpage {
+        @apply flex flex-col gap-5;
+    }
+    .hrd-page-inline-wrap {
+        @apply flex items-center gap-4 mb-3;
+    }
+    .hrd-page-inline-title {
+        @apply text-base font-bold text-gray-900 whitespace-nowrap;
+    }
+    .hrd-page-inline-line {
+        @apply h-px bg-gray-900 flex-1;
+    }
+    .hrd-job-toolbar {
+        @apply flex items-center justify-between gap-4 flex-wrap mb-2;
+    }
+    .hrd-job-toolbar-left {
+        @apply flex items-center gap-3 flex-wrap;
+    }
+    .hrd-filter-btn {
+        @apply inline-flex items-center gap-2 border border-gray-900 bg-white px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50 transition-colors rounded;
+    }
+    .hrd-jobsearch-input {
+        @apply border border-gray-900 bg-white text-sm text-gray-900 px-4 py-2 w-64 md:w-80 rounded placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-black;
+    }
+    .hrd-filter-submit-btn {
+        @apply inline-flex items-center justify-center border border-black bg-black text-white px-6 py-2 text-sm font-bold tracking-wider hover:bg-neutral-800 transition-colors rounded;
+    }
+    .hrd-buka-lowongan-btn {
+        @apply inline-flex items-center justify-center border border-gray-900 bg-white text-black px-5 py-2 text-xs font-black tracking-wider uppercase hover:bg-gray-100 transition-colors rounded;
+    }
+
+    .hrd-job-list {
+        @apply flex flex-col gap-3;
+    }
+    .hrd-job-card {
+        @apply flex items-center gap-4 border border-gray-900 rounded-lg bg-white px-4 py-3 shadow-sm hover:shadow transition-shadow;
+    }
+    .hrd-job-thumb-icon {
+        @apply w-12 h-12 bg-gray-400 rounded-md flex-shrink-0 flex items-center justify-center text-white;
+    }
+    .hrd-job-details {
+        @apply flex-1 min-w-0 flex flex-col justify-center;
+    }
+    .hrd-job-heading {
+        @apply flex items-center gap-2.5 flex-wrap mb-1;
+    }
+    .hrd-job-title-text {
+        @apply text-base font-bold text-gray-900;
+    }
+    .hrd-job-type-outline {
+        @apply border border-gray-900 bg-white text-gray-900 text-xs font-bold px-2 py-0.5 rounded tracking-wide;
+    }
+    .hrd-job-type-solid {
+        @apply bg-black text-white text-xs font-bold px-2.5 py-0.5 rounded tracking-wider uppercase;
+    }
+    .hrd-job-draft-tag {
+        @apply inline-flex items-center gap-1.5 text-xs text-gray-700 font-medium ml-2;
+    }
+    .hrd-job-submeta {
+        @apply flex items-center gap-4 text-xs text-gray-600 font-medium;
+    }
+    .hrd-job-btn-actions {
+        @apply flex items-center gap-2 ml-auto flex-shrink-0;
+    }
+    .hrd-job-icon-btn {
+        @apply w-10 h-10 border border-gray-900 rounded-md flex items-center justify-center bg-white text-gray-800 hover:bg-gray-100 hover:text-black transition-colors;
+    }
+    .hrd-filter-dropdown-menu {
+        @apply absolute top-full left-0 mt-1 bg-white border border-gray-900 rounded shadow-lg p-3 z-30 min-w-[220px] flex flex-col gap-2;
+    }
+
+    /* ===================================================
+       MULTI-STEP WIZARD: EDIT / BUKA LOWONGAN (Images 1, 2, 3)
+       =================================================== */
+    .hrd-wizard-container {
+        @apply flex flex-col gap-6;
+    }
+    .hrd-stepper-wrap {
+        @apply flex items-center justify-between max-w-2xl mx-auto w-full py-4 px-2;
+    }
+    .hrd-stepper-item {
+        @apply flex flex-col items-center gap-2 relative;
+    }
+    .hrd-stepper-box {
+        @apply w-10 h-10 border border-gray-900 bg-white flex items-center justify-center text-sm font-bold text-gray-900 rounded-sm transition-all;
+    }
+    .hrd-stepper-box--active {
+        @apply border-2 border-black bg-white text-black font-extrabold shadow-sm;
+    }
+    .hrd-stepper-box--completed {
+        @apply border-black bg-black text-white;
+    }
+    .hrd-stepper-label {
+        @apply text-xs font-semibold text-gray-900 text-center uppercase tracking-tight max-w-[120px];
+    }
+    .hrd-stepper-connector {
+        @apply flex-1 h-[1.5px] bg-gray-400 mx-4 -mt-6;
+    }
+
+    .hrd-wizard-card {
+        @apply border border-gray-900 rounded-lg bg-white p-6 md:p-8 shadow-sm;
+    }
+    .hrd-wizard-section-head {
+        @apply flex items-center gap-3 mb-6 pb-2 border-b border-gray-200;
+    }
+    .hrd-wizard-section-title {
+        @apply text-base font-bold text-gray-900 uppercase tracking-wider;
+    }
+    .hrd-wizard-section-line {
+        @apply h-[1.5px] bg-gray-400 flex-1;
+    }
+
+    .hrd-form-two-col {
+        @apply grid grid-cols-1 md:grid-cols-2 gap-5;
+    }
+    .hrd-input-group {
+        @apply flex flex-col gap-1.5;
+    }
+    .hrd-input-label {
+        @apply text-sm font-bold text-gray-900;
+    }
+    .hrd-input-control {
+        @apply border border-gray-900 rounded-md px-3.5 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-black placeholder:text-gray-400;
+    }
+    .hrd-toggle-group {
+        @apply flex gap-2;
+    }
+    .hrd-toggle-btn {
+        @apply flex-1 border border-gray-900 py-2.5 text-center text-xs font-bold uppercase tracking-wider transition-colors rounded-md;
+    }
+    .hrd-toggle-btn--active {
+        @apply bg-black text-white border-black;
+    }
+    .hrd-toggle-btn--inactive {
+        @apply bg-white text-black hover:bg-gray-50;
+    }
+    .hrd-range-inputs {
+        @apply grid grid-cols-2 gap-3;
+    }
+
+    .hrd-wizard-footer {
+        @apply flex items-center justify-between gap-4 pt-6 mt-6 border-t border-gray-200;
+    }
+    .hrd-wizard-back-btn {
+        @apply inline-flex items-center justify-center border border-gray-900 bg-white hover:bg-gray-100 text-black text-xs font-bold py-3 px-8 rounded-md tracking-wider uppercase transition-colors;
+    }
+    .hrd-wizard-forward-btn {
+        @apply inline-flex items-center justify-center border border-black bg-black hover:bg-neutral-800 text-white text-xs font-bold py-3 px-8 rounded-md tracking-wider uppercase transition-colors disabled:opacity-50;
+    }
+
+    /* --- Preview & ATS Review (Step 3) --- */
+    .hrd-preview-post-card {
+        @apply border border-gray-900 rounded-lg p-6 bg-white mb-6;
+    }
+    .hrd-preview-header-line {
+        @apply flex items-start justify-between gap-4 mb-2;
+    }
+    .hrd-preview-title {
+        @apply text-lg font-bold text-gray-900;
+    }
+    .hrd-preview-submeta {
+        @apply text-xs font-semibold text-gray-700 tracking-wide mb-4;
+    }
+    .hrd-preview-body-content {
+        @apply text-sm text-gray-800 leading-relaxed border-t border-b border-gray-200 py-5 my-4 whitespace-pre-wrap;
+    }
+    .hrd-preview-badge-row {
+        @apply flex flex-wrap items-center gap-2 pt-2;
+    }
+    .hrd-preview-pill-badge {
+        @apply border border-gray-900 bg-white text-gray-900 px-3 py-1 rounded text-xs font-bold tracking-wider;
+    }
+    .hrd-ats-section-card {
+        @apply border border-gray-900 rounded-lg p-6 bg-white mb-6;
+    }
+    .hrd-ats-section-title {
+        @apply text-xs font-bold uppercase tracking-wider text-gray-900 mb-6;
+    }
+    .hrd-ats-grid-3col {
+        @apply grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-300 text-center;
+    }
+    .hrd-ats-metric {
+        @apply py-4 px-2 flex flex-col items-center justify-center;
+    }
+    .hrd-ats-number {
+        @apply text-4xl font-extrabold text-black mb-1;
+    }
+    /* ================================================
+       KANDIDAT DETAIL LAYOUT & DETAIL PAGES
+       ================================================ */
+    .kandidat-detail-container {
+        @apply hrd-page-section max-w-5xl mx-auto mt-6 p-8 bg-white border border-gray-200 shadow-sm;
+    }
+    .kandidat-detail-header {
+        @apply flex justify-between items-center mb-8 pb-4 border-b border-gray-300;
+    }
+    .kandidat-detail-title {
+        @apply hrd-page-main-title text-xl;
+    }
+    .kandidat-detail-grid {
+        @apply grid grid-cols-1 md:grid-cols-3 gap-8;
+    }
+    .kandidat-photo-col {
+        @apply col-span-1;
+    }
+    .kandidat-photo-box {
+        @apply w-full aspect-square border-2 border-gray-300 flex items-center justify-center bg-gray-50;
+    }
+    .kandidat-photo-img {
+        @apply w-full h-full object-cover;
+    }
+    .kandidat-photo-placeholder {
+        @apply font-bold text-gray-500;
+    }
+    .kandidat-info-col {
+        @apply col-span-1 md:col-span-2 flex flex-col gap-5;
+    }
+    .kandidat-info-stack {
+        @apply grid grid-cols-1 gap-3;
+    }
+    .kandidat-content-slot {
+        @apply mt-2;
+    }
+    .kandidat-flow {
+        @apply flex flex-col gap-5;
+    }
+    .kandidat-form-flow {
+        @apply flex flex-col gap-6;
+    }
+    .kandidat-form-stack {
+        @apply flex flex-col gap-4;
+    }
+    .kandidat-box {
+        @apply border border-gray-800 rounded p-4 bg-white;
+    }
+    .kandidat-box-label {
+        @apply hrd-section-label mb-4;
+    }
+    .kandidat-sosmed-list {
+        @apply flex flex-col gap-3 mb-5;
+    }
+    .kandidat-sosmed-item {
+        @apply grid grid-cols-3 gap-2 items-center;
+    }
+    .kandidat-sosmed-link {
+        @apply col-span-2 text-blue-600 text-sm hover:underline truncate;
+    }
+    .kandidat-doc-row {
+        @apply flex justify-between items-center border border-dashed border-gray-400 rounded p-2.5;
+    }
+    .kandidat-doc-meta {
+        @apply flex items-center gap-2;
+    }
+    .kandidat-doc-filename {
+        @apply text-sm text-gray-700 truncate max-w-xs;
+    }
+    .kandidat-doc-actions {
+        @apply flex gap-2;
+    }
+    .kandidat-doc-empty {
+        @apply text-sm text-gray-500 italic border border-dashed border-gray-400 rounded p-3 text-center;
+    }
+    .kandidat-action-grid-2 {
+        @apply grid grid-cols-2 gap-4 mt-2;
+    }
+    .kandidat-action-grid-3 {
+        @apply grid grid-cols-3 gap-4 mt-8;
+    }
+    .kandidat-action-grid-responsive {
+        @apply grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4;
+    }
+    .kandidat-action-mt {
+        @apply mt-4;
+    }
+    .kandidat-action-center {
+        @apply text-center mt-2;
+    }
+    .kandidat-form-grid-2 {
+        @apply grid grid-cols-1 sm:grid-cols-2 gap-4;
+    }
+    .form-group {
+        @apply flex flex-col gap-1;
+    }
+    .form-grid-2 {
+        @apply grid grid-cols-2 gap-4;
+    }
+    .form-textarea-lg {
+        @apply form-textarea-base h-40;
+    }
+    .form-input-readonly {
+        @apply form-input-base bg-gray-50 text-gray-600 cursor-not-allowed;
+    }
+    .kandidat-alert-warning {
+        @apply bg-amber-50 border-2 border-amber-400 rounded-lg p-4 space-y-2;
+    }
+    .kandidat-alert-amber {
+        @apply bg-amber-50 border-2 border-amber-300 rounded-lg p-4 space-y-1.5 text-xs;
+    }
+    .kandidat-alert-row {
+        @apply flex items-center justify-between;
+    }
+    .kandidat-alert-header {
+        @apply flex items-center gap-2;
+    }
+    .kandidat-alert-badge {
+        @apply text-[11px] font-bold uppercase tracking-wider text-amber-900 bg-amber-200 px-2.5 py-0.5 rounded;
+    }
+    .kandidat-alert-pill {
+        @apply font-bold uppercase tracking-wider bg-amber-200 text-amber-900 px-2 py-0.5 rounded text-[10px];
+    }
+    .kandidat-alert-label {
+        @apply text-xs font-bold text-amber-800;
+    }
+    .kandidat-alert-desc {
+        @apply text-xs text-amber-900 font-medium;
+    }
+    .kandidat-alert-body {
+        @apply bg-white border border-amber-300 rounded p-3 text-xs text-black font-mono whitespace-pre-line leading-relaxed;
+    }
+    .kandidat-alert-mono {
+        @apply text-gray-800 font-mono whitespace-pre-line leading-relaxed mt-1;
+    }
+    .btn-kandidat-reschedule {
+        @apply btn-primary w-full text-xs !py-3 tracking-wider font-bold mt-2;
+    }
+    .kandidat-reschedule-link {
+        @apply text-sm font-bold text-gray-600 hover:text-black underline underline-offset-2 transition-colors;
+    }
+
+    /* ================================================
+       PELAMAR LAYOUT
+       ================================================ */
+    .pelamar-shell {
+        @apply min-h-screen bg-white flex flex-col font-sans text-gray-900;
+    }
+    .pelamar-body-wrapper {
+        @apply flex flex-1 min-h-[calc(100vh-120px)];
+    }
+    .pelamar-sidebar {
+        @apply w-52 md:w-56 bg-white border-r border-gray-300 flex flex-col flex-shrink-0 p-4 justify-between;
+    }
+    .pelamar-user-box {
+        @apply flex items-center gap-2.5 pb-5 mb-3 border-b border-gray-200;
+    }
+    .pelamar-avatar {
+        @apply hrd-sidebar-avatar flex items-center justify-center;
+    }
+    .pelamar-user-meta {
+        @apply min-w-0 flex-1;
+    }
+    .pelamar-email {
+        @apply hrd-sidebar-email font-semibold font-mono break-all;
+    }
+    .pelamar-nav-list {
+        @apply flex flex-col gap-2.5;
+    }
+    .pelamar-content-main {
+        @apply flex-1 bg-white p-6 overflow-x-hidden;
+    }
+    .pelamar-footer-brand {
+        @apply flex items-center gap-2.5;
+    }
+    .pelamar-footer-brand-text {
+        @apply font-semibold tracking-wide;
+    }
+    .pelamar-footer-contact {
+        @apply footer-link uppercase tracking-widest;
+    }
+    .pelamar-modal-body {
+        @apply space-y-3 text-xs;
+    }
+    .pelamar-modal-grid-2 {
+        @apply grid grid-cols-2 gap-3;
+    }
+    .pelamar-modal-footer {
+        @apply pt-4 mt-4 border-t border-gray-200 flex justify-end;
+    }
+    .pelamar-modal-desc {
+        @apply text-gray-600 leading-relaxed;
+    }
+    .pelamar-modal-strong {
+        @apply font-bold text-black block mb-1;
+    }
+    .pelamar-modal-subtext {
+        @apply text-gray-600 text-[11px];
+    }
+
+    /* ================================================
+       JOB SHOW & EXPLORE JOBS
+       ================================================ */
+    .job-detail-page {
+        @apply min-h-screen flex flex-col bg-gray-50 font-sans pb-20;
+    }
+    .job-detail-main {
+        @apply flex-grow max-w-4xl mx-auto w-full mt-10 px-6;
+    }
+    .job-detail-card {
+        @apply card-base p-8 sm:p-10;
+    }
+    .job-detail-header {
+        @apply border-b border-gray-200 pb-8 mb-8 flex flex-col sm:flex-row justify-between items-start gap-4;
+    }
+    .job-detail-title {
+        @apply text-3xl sm:text-4xl font-extrabold text-black mb-3;
+    }
+    .job-detail-meta {
+        @apply flex flex-wrap items-center gap-3 text-gray-600 font-medium text-sm;
+    }
+    .job-detail-content {
+        @apply space-y-6;
+    }
+    .job-section-label {
+        @apply text-xs font-bold uppercase tracking-wider text-gray-500 mb-2;
+    }
+    .job-section-text {
+        @apply whitespace-pre-line text-sm text-gray-700 leading-relaxed;
+    }
+    .job-salary-card {
+        @apply info-card p-5 mt-6;
+    }
+    .job-salary-label {
+        @apply info-card-label mb-1;
+    }
+    .job-salary-value {
+        @apply text-black font-extrabold text-xl;
+    }
+    .job-apply-form {
+        @apply space-y-4 pt-2;
+    }
+    .job-apply-actions {
+        @apply pt-4 flex justify-end gap-3;
+    }
+    .form-input-file {
+        @apply form-input-base cursor-pointer;
+    }
+
+    .jobs-header {
+        @apply text-center mb-12;
+    }
+    .jobs-title {
+        @apply text-4xl font-extrabold text-gray-900 tracking-tight;
+    }
+    .jobs-subtitle {
+        @apply mt-4 text-lg text-gray-500;
+    }
+    .jobs-search-form {
+        @apply max-w-3xl mx-auto;
+    }
+    .jobs-search-bar {
+        @apply flex flex-col md:flex-row items-center justify-center gap-3;
+    }
+    .jobs-filter-chips {
+        @apply mt-5 flex flex-wrap justify-center gap-3;
+    }
+    .jobs-list-container {
+        @apply mt-10 space-y-4;
+    }
+    .jobs-card-info {
+        @apply flex items-center gap-4 w-full;
+    }
+    .jobs-card-body {
+        @apply flex-1 min-w-0;
+    }
+    .jobs-card-title-row {
+        @apply flex flex-wrap items-center gap-3;
+    }
+    .jobs-card-title {
+        @apply text-2xl font-bold text-gray-900 leading-tight;
+    }
+    .jobs-card-meta {
+        @apply mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-600;
+    }
+
+    /* ================================================
+       HEADER & FOOTER SUB-ELEMENTS
+       ================================================ */
+    .header-inner {
+        @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    }
+    .header-row {
+        @apply flex justify-between items-center h-20;
+    }
+    .header-brand-link {
+        @apply flex items-center gap-3;
+    }
+    .header-nav {
+        @apply flex items-center space-x-6 sm:space-x-8;
+    }
+    .header-dropdown-wrap {
+        @apply relative ms-3;
+    }
+    .header-user-btn {
+        @apply btn-outline;
+    }
+    .header-user-avatar-placeholder {
+        @apply w-5 h-5 rounded-sm border border-gray-400;
+    }
+
+    .footer-inner {
+        @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center;
+    }
+    .footer-brand-box {
+        @apply flex items-center gap-4 mb-4 md:mb-0;
+    }
+    .footer-meta-row {
+        @apply flex items-center gap-3 text-sm font-medium;
+    }
+    .footer-dot {
+        @apply text-gray-600 text-xs;
+    }
+    .hrd-footer-brand {
+        @apply flex items-center gap-2;
+    }
+
+    /* ================================================
+       PELAMAR DASHBOARD ELEMENTS
+       ================================================ */
+    .pelamar-dashboard-container {
+        @apply max-w-7xl mx-auto space-y-6;
+    }
+    .flash-success-row {
+        @apply flash-success flex items-center justify-between;
+    }
+    .flash-close-green {
+        @apply text-green-600 hover:text-green-900 font-bold ml-4;
+    }
+    .flash-error-row {
+        @apply flash-error flex items-center justify-between;
+    }
+    .flash-close-red {
+        @apply text-red-600 hover:text-red-900 font-bold ml-4;
+    }
+    .pelamar-dashboard-grid {
+        @apply grid grid-cols-1 lg:grid-cols-12 gap-8 items-start;
+    }
+    .pelamar-grid-left {
+        @apply lg:col-span-5 flex flex-col;
+    }
+    .pelamar-empty-card {
+        @apply border border-gray-300 rounded-lg p-8 text-center bg-gray-50 mb-4;
+    }
+    .pelamar-empty-title {
+        @apply text-gray-600 font-semibold mb-2;
+    }
+    .pelamar-empty-desc {
+        @apply text-xs text-gray-500 mb-6;
+    }
+    .pelamar-app-list {
+        @apply space-y-3.5 mb-4;
+    }
+    .pelamar-card-top {
+        @apply flex justify-between items-start mb-1;
+    }
+    .pelamar-card-title {
+        @apply text-base font-bold text-black tracking-tight leading-snug;
+    }
+    .pelamar-card-sub {
+        @apply text-xs text-gray-500 font-medium mb-4;
+    }
+    .pelamar-card-foot {
+        @apply flex justify-between items-center pt-1;
+    }
+    .pelamar-card-date {
+        @apply text-[11px] text-gray-400 font-medium;
+    }
+    .btn-explore-more {
+        @apply btn-primary w-full mt-2;
+    }
+    .pelamar-grid-right {
+        @apply lg:col-span-7 flex flex-col;
+    }
+    .pelamar-stepper-card {
+        @apply border border-gray-800 rounded-lg p-5 mb-5 bg-white shadow-sm;
+    }
+    .pelamar-stepper-head {
+        @apply flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-4;
+    }
+    .pelamar-stepper-title {
+        @apply text-[11px] font-bold text-gray-800 uppercase tracking-widest flex items-center gap-1.5;
+    }
+    .pelamar-stepper-sep {
+        @apply text-gray-400 font-normal;
+    }
+    .pelamar-stepper-hint {
+        @apply text-[10px] text-gray-500 font-normal normal-case;
+    }
+    .pelamar-stepper-status {
+        @apply text-[10px] text-gray-500 font-medium;
+    }
+    .pelamar-strong {
+        @apply text-black font-bold;
+    }
+    .pelamar-stepper-track {
+        @apply w-full relative pt-1 pb-1;
+    }
+    .pelamar-stepper-steps {
+        @apply flex items-start w-full relative;
+    }
+    .pelamar-step-btn {
+        @apply flex-1 relative flex flex-col items-center text-center cursor-pointer focus:outline-none;
+    }
+    .pelamar-history-alert {
+        @apply bg-amber-50 border border-amber-300 text-amber-900 px-4 py-2.5 rounded-lg mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-sm transition-all;
+    }
+    .pelamar-history-text {
+        @apply flex items-center gap-2 text-xs;
+    }
+    .pelamar-history-btn {
+        @apply text-xs font-bold text-black hover:text-amber-900 underline flex items-center gap-1 cursor-pointer;
+    }
+    .pelamar-card-stage-wrap {
+        @apply card-base !p-0 overflow-hidden mb-6;
+    }
+    .pelamar-stage-body {
+        @apply p-5 bg-white space-y-4;
+    }
+    .pelamar-stage-desc-card {
+        @apply card-base-sm;
+    }
+    .pelamar-stage-desc-head {
+        @apply flex justify-between items-start mb-2;
+    }
+    .pelamar-stage-desc-title {
+        @apply text-xs font-bold text-gray-800 uppercase tracking-wider;
+    }
+    .pelamar-stage-desc-text {
+        @apply text-xs text-gray-600 leading-relaxed;
+    }
+    .pelamar-stage-grid-2 {
+        @apply grid grid-cols-1 sm:grid-cols-2 gap-3;
+    }
+    .btn-action-primary {
+        @apply btn-primary w-full text-xs !py-3 tracking-widest font-bold;
+    }
+    .pelamar-link-button {
+        @apply text-xs font-bold text-blue-600 hover:underline tracking-wide;
+    }
+    .pelamar-sk-card {
+        @apply card-base-sm bg-gray-50/70 space-y-3;
+    }
+    .pelamar-sk-header {
+        @apply flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-300 pb-3;
+    }
+    .pelamar-sk-icon-box {
+        @apply w-10 h-10 bg-red-600 text-white rounded flex items-center justify-center font-bold text-xs tracking-wider shadow-sm flex-shrink-0;
+    }
+    .pelamar-sk-title {
+        @apply text-xs font-bold text-black uppercase tracking-wider font-mono;
+    }
+    .pelamar-sk-subtitle {
+        @apply text-[11px] text-gray-500 mt-0.5;
+    }
+    .pelamar-sk-desc {
+        @apply text-xs text-gray-600 leading-relaxed;
+    }
+    .pelamar-sk-actions {
+        @apply flex flex-col sm:flex-row gap-2.5 pt-1;
+    }
+    .btn-sk-download {
+        @apply btn-primary flex-1 !py-2.5 flex items-center justify-center gap-2;
+    }
+    .btn-sk-print {
+        @apply btn-secondary sm:w-auto !py-2.5 flex items-center justify-center gap-2;
+    }
+    .hrd-textarea-large {
+        @apply w-full border border-gray-900 rounded-md p-4 text-sm leading-relaxed text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-black min-h-[280px];
+    }
+    .hrd-wizard-title-group {
+        @apply flex items-center gap-3 flex-1;
+    }
+    .hrd-wizard-status-tag {
+        @apply badge-status-black ml-4 uppercase text-[11px] font-extrabold tracking-wider;
+    }
+    .hrd-job-draft-icon {
+        @apply w-3.5 h-3.5 border border-gray-600 rounded-sm inline-flex items-center justify-center text-[10px] leading-none;
+    }
+}
+
+
+

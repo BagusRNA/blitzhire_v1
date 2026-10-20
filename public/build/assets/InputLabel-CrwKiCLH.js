@@ -1,0 +1,1 @@
+import{t as e}from"./app-DEeLkYlq.js";var t=e();function n({value:e,className:n=``,children:r,...i}){return(0,t.jsx)(`label`,{...i,className:`form-label ${n}`,children:e||r})}export{n as t};
