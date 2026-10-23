@@ -83,15 +83,11 @@ class JobController extends Controller
 
     public function kelolaJob(Request $request)
     {
-        $hrdId = auth('hrd')->id();
         $search = trim((string) $request->input('keyword', $request->input('search', '')));
         $status = trim((string) $request->input('status', 'Semua'));
         $type = trim((string) $request->input('type', 'Semua'));
 
         $query = Lowongan::query();
-        if ($hrdId) {
-            $query->where('id_hrd', $hrdId);
-        }
 
         if ($search !== '') {
             $term = "%{$search}%";
@@ -185,12 +181,7 @@ class JobController extends Controller
 
     public function edit($id_lowongan)
     {
-        $hrdId = auth('hrd')->id();
-        $query = Lowongan::where('id_lowongan', $id_lowongan);
-        if ($hrdId) {
-            $query->where('id_hrd', $hrdId);
-        }
-        $lowongan = $query->firstOrFail();
+        $lowongan = Lowongan::where('id_lowongan', $id_lowongan)->firstOrFail();
 
         return Inertia::render('HRD/EditLowongan', [
             'lowongan' => $lowongan,
@@ -200,12 +191,7 @@ class JobController extends Controller
 
     public function update(Request $request, $id_lowongan)
     {
-        $hrdId = auth('hrd')->id();
-        $query = Lowongan::where('id_lowongan', $id_lowongan);
-        if ($hrdId) {
-            $query->where('id_hrd', $hrdId);
-        }
-        $lowongan = $query->firstOrFail();
+        $lowongan = Lowongan::where('id_lowongan', $id_lowongan)->firstOrFail();
 
         $validated = $request->validate([
             'posisi' => 'required|string|max:100',
@@ -232,12 +218,7 @@ class JobController extends Controller
 
     public function destroy($id_lowongan)
     {
-        $hrdId = auth('hrd')->id();
-        $query = Lowongan::where('id_lowongan', $id_lowongan);
-        if ($hrdId) {
-            $query->where('id_hrd', $hrdId);
-        }
-        $lowongan = $query->firstOrFail();
+        $lowongan = Lowongan::where('id_lowongan', $id_lowongan)->firstOrFail();
         $lowongan->delete();
 
         return redirect()->route('hrd.kelola-job')->with('success', 'Lowongan berhasil dihapus.');

@@ -12,16 +12,14 @@ class HRDController extends Controller
 {
     public function dashboard()
     {
-        $hrdId = auth('hrd')->id();
-
         // Lowongan stats
-        $lowonganQuery = Lowongan::where('id_hrd', $hrdId)->where('status_lowongan', 'Aktif');
+        $lowonganQuery = Lowongan::where('status_lowongan', 'Aktif');
         $lowongan_aktif      = (clone $lowonganQuery)->count();
         $lowongan_fulltime   = (clone $lowonganQuery)->where('tipe_pekerjaan', 'Full-Time')->count();
         $lowongan_magang     = (clone $lowonganQuery)->whereIn('tipe_pekerjaan', ['Magang', 'PKL', 'Magang / PKL'])->count();
 
         // Pelamar stats
-        $baseQuery = Lamaran::whereHas('lowongan', fn($q) => $q->where('id_hrd', $hrdId));
+        $baseQuery = Lamaran::query();
         $total_pelamar = (clone $baseQuery)->count();
         $pelamar_baru_bulan_ini = (clone $baseQuery)
             ->whereMonth('tanggal_lamaran', now()->month)
@@ -30,12 +28,10 @@ class HRDController extends Controller
 
         // Wawancara hari ini
         $today = Carbon::today();
-        $wawancara_hari_ini = JadwalWawancara::whereHas('lamaran.lowongan', fn($q) => $q->where('id_hrd', $hrdId))
-            ->whereDate('tanggal_wawancara', $today)
+        $wawancara_hari_ini = JadwalWawancara::whereDate('tanggal_wawancara', $today)
             ->count();
 
-        $jadwal_terdekat = JadwalWawancara::whereHas('lamaran.lowongan', fn($q) => $q->where('id_hrd', $hrdId))
-            ->whereDate('tanggal_wawancara', $today)
+        $jadwal_terdekat = JadwalWawancara::whereDate('tanggal_wawancara', $today)
             ->orderBy('tanggal_wawancara')
             ->first();
 
@@ -45,7 +41,6 @@ class HRDController extends Controller
 
         // Recent applications
         $recentApplications = Lamaran::with(['pelamar', 'lowongan'])
-            ->whereHas('lowongan', fn($q) => $q->where('id_hrd', $hrdId))
             ->orderBy('tanggal_lamaran', 'desc')
             ->take(10)
             ->get();
@@ -66,10 +61,7 @@ class HRDController extends Controller
 
     public function manajemenKandidat()
     {
-        $hrdId = auth('hrd')->id();
-
         $lamaran = Lamaran::with(['pelamar', 'lowongan', 'dokumen', 'wawancara', 'penawaran'])
-            ->whereHas('lowongan', fn($q) => $q->where('id_hrd', $hrdId))
             ->orderBy('tanggal_lamaran', 'desc')
             ->get();
 
@@ -80,10 +72,7 @@ class HRDController extends Controller
 
     public function manajemenData()
     {
-        $hrdId = auth('hrd')->id();
-
         $pelamar = Lamaran::with(['pelamar', 'dokumen'])
-            ->whereHas('lowongan', fn($q) => $q->where('id_hrd', $hrdId))
             ->orderBy('tanggal_lamaran', 'desc')
             ->get();
 
@@ -94,9 +83,7 @@ class HRDController extends Controller
 
     public function destroyLamaran($id_lamaran)
     {
-        $hrdId = auth('hrd')->id();
-        $lamaran = Lamaran::whereHas('lowongan', fn($q) => $q->where('id_hrd', $hrdId))
-            ->findOrFail($id_lamaran);
+        $lamaran = Lamaran::findOrFail($id_lamaran);
         $lamaran->delete();
 
         return back()->with('success', 'Data pelamar berhasil dihapus.');

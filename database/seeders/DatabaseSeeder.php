@@ -22,13 +22,23 @@ class DatabaseSeeder extends Seeder
         DB::table('pelamar')->delete();
         DB::table('hrd')->delete();
 
-        $hrdId = DB::table('hrd')->insertGetId([
-            'nama_pengguna' => 'Admin HRD',
+        $hrdBlitzHireId = DB::table('hrd')->insertGetId([
+            'nama_pengguna' => 'Admin HRD BlitzHire',
             'email' => 'hrd@blitzhire.com',
             'kata_sandi' => Hash::make('password'),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        $hrdGmailId = DB::table('hrd')->insertGetId([
+            'nama_pengguna' => 'Admin HRD',
+            'email' => 'adminhrd@gmail.com',
+            'kata_sandi' => Hash::make('hrd12345'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $hrdId = $hrdGmailId;
 
         $positions = [
             [
@@ -109,14 +119,15 @@ class DatabaseSeeder extends Seeder
         }
 
         $candidateData = [
-            ['nama_lengkap' => 'Adit Pratama', 'email' => 'adit.pratama@gmail.com', 'nomor_hp' => '081234560001', 'alamat' => 'Jl. Cempaka No. 12, Jakarta', 'pendidikan_terakhir' => 'S1 Teknik Informatika'],
-            ['nama_lengkap' => 'Bunga Lestari', 'email' => 'bunga.lestari@gmail.com', 'nomor_hp' => '081234560002', 'alamat' => 'Jl. Mawar No. 8, Bandung', 'pendidikan_terakhir' => 'D3 Desain Komunikasi Visual'],
-            ['nama_lengkap' => 'Candra Wijaya', 'email' => 'candra.wijaya@gmail.com', 'nomor_hp' => '081234560003', 'alamat' => 'Jl. Merdeka No. 5, Surabaya', 'pendidikan_terakhir' => 'S1 Statistika'],
-            ['nama_lengkap' => 'Desi Rahma', 'email' => 'desi.rahma@gmail.com', 'nomor_hp' => '081234560004', 'alamat' => 'Jl. Kenanga No. 21, Yogyakarta', 'pendidikan_terakhir' => 'S1 Teknik Elektro'],
-            ['nama_lengkap' => 'Eko Setiawan', 'email' => 'eko.setiawan@gmail.com', 'nomor_hp' => '081234560005', 'alamat' => 'Jl. Diponegoro No. 17, Semarang', 'pendidikan_terakhir' => 'S1 Teknik Komputer'],
-            ['nama_lengkap' => 'Farah Nabilah', 'email' => 'farah.nabilah@gmail.com', 'nomor_hp' => '081234560006', 'alamat' => 'Jl. Panjang No. 2, Bekasi', 'pendidikan_terakhir' => 'S1 Manajemen'],
-            ['nama_lengkap' => 'Gita Mariana', 'email' => 'gita.mariana@gmail.com', 'nomor_hp' => '081234560007', 'alamat' => 'Jl. Cikini No. 40, Jakarta', 'pendidikan_terakhir' => 'S1 Sistem Informasi'],
-            ['nama_lengkap' => 'Hendra Putra', 'email' => 'hendra.putra@gmail.com', 'nomor_hp' => '081234560008', 'alamat' => 'Jl. Raya Bogor No. 11, Depok', 'pendidikan_terakhir' => 'S1 Manajemen Bisnis'],
+            ['nama_lengkap' => 'Adit Pratama', 'email' => 'adit.pratama@gmail.com', 'kata_sandi' => 'password', 'nomor_hp' => '081234560001', 'alamat' => 'Jl. Cempaka No. 12, Jakarta', 'pendidikan_terakhir' => 'S1 Teknik Informatika'],
+            ['nama_lengkap' => 'Bunga Lestari', 'email' => 'bunga.lestari@gmail.com', 'kata_sandi' => 'password', 'nomor_hp' => '081234560002', 'alamat' => 'Jl. Mawar No. 8, Bandung', 'pendidikan_terakhir' => 'D3 Desain Komunikasi Visual'],
+            ['nama_lengkap' => 'Candra Wijaya', 'email' => 'candra.wijaya@gmail.com', 'kata_sandi' => 'password', 'nomor_hp' => '081234560003', 'alamat' => 'Jl. Merdeka No. 5, Surabaya', 'pendidikan_terakhir' => 'S1 Statistika'],
+            ['nama_lengkap' => 'Desi Rahma', 'email' => 'desi.rahma@gmail.com', 'kata_sandi' => 'password', 'nomor_hp' => '081234560004', 'alamat' => 'Jl. Kenanga No. 21, Yogyakarta', 'pendidikan_terakhir' => 'S1 Teknik Elektro'],
+            ['nama_lengkap' => 'Eko Setiawan', 'email' => 'eko.setiawan@gmail.com', 'kata_sandi' => 'password', 'nomor_hp' => '081234560005', 'alamat' => 'Jl. Diponegoro No. 17, Semarang', 'pendidikan_terakhir' => 'S1 Teknik Komputer'],
+            ['nama_lengkap' => 'Farah Nabilah', 'email' => 'farah.nabilah@gmail.com', 'kata_sandi' => 'password', 'nomor_hp' => '081234560006', 'alamat' => 'Jl. Panjang No. 2, Bekasi', 'pendidikan_terakhir' => 'S1 Manajemen'],
+            ['nama_lengkap' => 'Gita Mariana', 'email' => 'gita.mariana@gmail.com', 'kata_sandi' => 'password', 'nomor_hp' => '081234560007', 'alamat' => 'Jl. Cikini No. 40, Jakarta', 'pendidikan_terakhir' => 'S1 Sistem Informasi'],
+            ['nama_lengkap' => 'Hendra Putra', 'email' => 'hendra.putra@gmail.com', 'kata_sandi' => 'password', 'nomor_hp' => '081234560008', 'alamat' => 'Jl. Raya Bogor No. 11, Depok', 'pendidikan_terakhir' => 'S1 Manajemen Bisnis'],
+            ['nama_lengkap' => 'Pelamar Demo', 'email' => 'pelamar@gmail.com', 'kata_sandi' => 'tes12345', 'nomor_hp' => '081298765432', 'alamat' => 'Jl. Jenderal Sudirman No. 45, Jakarta Pusat', 'pendidikan_terakhir' => 'S1 Teknik Informatika'],
         ];
 
         $pelamarIds = [];
@@ -124,7 +135,7 @@ class DatabaseSeeder extends Seeder
             $pelamarIds[] = DB::table('pelamar')->insertGetId([
                 'nama_lengkap' => $candidate['nama_lengkap'],
                 'email' => $candidate['email'],
-                'kata_sandi' => Hash::make('password'),
+                'kata_sandi' => Hash::make($candidate['kata_sandi'] ?? 'password'),
                 'nomor_hp' => $candidate['nomor_hp'],
                 'alamat' => $candidate['alamat'],
                 'pendidikan_terakhir' => $candidate['pendidikan_terakhir'],
@@ -143,6 +154,8 @@ class DatabaseSeeder extends Seeder
             ['id_pelamar' => $pelamarIds[5], 'id_lowongan' => $jobIds[4], 'status_lamaran' => 'Offer', 'tanggal_lamaran' => Carbon::now()->subDays(11), 'skor_kecocokan' => 93.10],
             ['id_pelamar' => $pelamarIds[6], 'id_lowongan' => $jobIds[2], 'status_lamaran' => 'Diterima', 'tanggal_lamaran' => Carbon::now()->subDays(14), 'skor_kecocokan' => 95.20],
             ['id_pelamar' => $pelamarIds[7], 'id_lowongan' => $jobIds[4], 'status_lamaran' => 'Ditolak', 'tanggal_lamaran' => Carbon::now()->subDays(10), 'skor_kecocokan' => 61.00],
+            ['id_pelamar' => $pelamarIds[8], 'id_lowongan' => $jobIds[0], 'status_lamaran' => 'Wawancara', 'tanggal_lamaran' => Carbon::now()->subDays(5), 'skor_kecocokan' => 89.50],
+            ['id_pelamar' => $pelamarIds[8], 'id_lowongan' => $jobIds[4], 'status_lamaran' => 'Offer', 'tanggal_lamaran' => Carbon::now()->subDays(7), 'skor_kecocokan' => 92.00],
         ];
 
         foreach ($lamaranRows as $row) {
@@ -166,6 +179,8 @@ class DatabaseSeeder extends Seeder
             ['id_lamaran' => $lamaranIds[5], 'jenis_dokumen' => 'CV / Resume', 'file_dokumen' => 'farah_cv.pdf', 'path_file' => 'dummy/farah_cv.pdf', 'tanggal_upload' => Carbon::now()->subDays(10)],
             ['id_lamaran' => $lamaranIds[6], 'jenis_dokumen' => 'CV / Resume', 'file_dokumen' => 'gita_cv.pdf', 'path_file' => 'dummy/gita_cv.pdf', 'tanggal_upload' => Carbon::now()->subDays(13)],
             ['id_lamaran' => $lamaranIds[7], 'jenis_dokumen' => 'CV / Resume', 'file_dokumen' => 'hendra_cv.pdf', 'path_file' => 'dummy/hendra_cv.pdf', 'tanggal_upload' => Carbon::now()->subDays(9)],
+            ['id_lamaran' => $lamaranIds[8], 'jenis_dokumen' => 'CV / Resume', 'file_dokumen' => 'pelamar_cv.pdf', 'path_file' => 'dummy/pelamar_cv.pdf', 'tanggal_upload' => Carbon::now()->subDays(5)],
+            ['id_lamaran' => $lamaranIds[9], 'jenis_dokumen' => 'CV / Resume', 'file_dokumen' => 'pelamar_cv.pdf', 'path_file' => 'dummy/pelamar_cv.pdf', 'tanggal_upload' => Carbon::now()->subDays(7)],
         ];
 
         DB::table('dokumen_pelamar')->insert($documents);
@@ -192,6 +207,17 @@ class DatabaseSeeder extends Seeder
                 'link_meeting' => null,
                 'catatan' => 'Pemahaman QA automation sudah bagus dan komunikasi tim cukup kuat.',
                 'hasil_assigment' => 'Lolos ke tahap selanjutnya untuk kandidat yang dinilai mampu mengelola test strategy.',
+            ],
+            [
+                'id_lamaran' => $lamaranIds[8],
+                'tanggal_wawancara' => Carbon::now()->addDays(2)->setTime(14, 0, 0),
+                'lokasi' => 'Google Meet',
+                'interviewer' => 'Head of Engineering',
+                'status_wawancara' => 'Terjadwal',
+                'format_wawancara' => 'Online',
+                'link_meeting' => 'https://meet.google.com/blitz-hire-demo',
+                'catatan' => 'Wawancara teknis dan diskusi arsitektur sistem.',
+                'hasil_assigment' => null,
             ],
         ];
 
@@ -228,6 +254,14 @@ class DatabaseSeeder extends Seeder
                 'posisi_kerja' => 'Product Manager',
                 'lokasi_kerja' => 'Jakarta Selatan',
                 'status_penawaran' => 'Ditolak',
+                'tanggal_penawaran' => Carbon::now()->subDays(1)->toDateString(),
+            ],
+            [
+                'id_lamaran' => $lamaranIds[9],
+                'nominal_gaji' => 21000000,
+                'posisi_kerja' => 'Product Manager',
+                'lokasi_kerja' => 'Jakarta Selatan',
+                'status_penawaran' => 'Menunggu',
                 'tanggal_penawaran' => Carbon::now()->subDays(1)->toDateString(),
             ],
         ];

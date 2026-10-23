@@ -12,7 +12,6 @@ class LamaranDetailController extends Controller
 {
     // ─── Helpers ─────────────────────────────────────────────────────────────
 
-    /** Pastikan lamaran milik HRD yang sedang login */
     private function getLamaran($id_lamaran)
     {
         return Lamaran::with([
@@ -22,7 +21,6 @@ class LamaranDetailController extends Controller
             'wawancara',
             'penawaran',
         ])
-        ->whereHas('lowongan', fn($q) => $q->where('id_hrd', auth('hrd')->id()))
         ->findOrFail($id_lamaran);
     }
 

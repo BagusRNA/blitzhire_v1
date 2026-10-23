@@ -205,19 +205,26 @@ Gunakan akun berikut yang telah dibuat secara otomatis oleh `DatabaseSeeder`:
 
 ### 👑 1. Akun HRD / Administrator
 - **URL Login**: `http://127.0.0.1:8000/hrd-login`
-- **Email**: `hrd@blitzhire.com`
-- **Password**: `password`
+- **Akun Utama (Gmail)**:
+  - **Email**: `adminhrd@gmail.com`
+  - **Password**: `hrd12345`
+- **Akun Cadangan (BlitzHire)**:
+  - **Email**: `hrd@blitzhire.com`
+  - **Password**: `password`
 - **Hak Akses**: Kelola lowongan pekerjaan, verifikasi berkas kandidat, jadwalkan wawancara, buat penawaran kerja (*offering*), dan lihat laporan.
 
 ### 👤 2. Akun Pelamar / Kandidat
 - **URL Login**: `http://127.0.0.1:8000/kandidat/login`
-- **Daftar Akun Contoh**:
+- **Akun Demo Utama**:
+  - **Email**: `pelamar@gmail.com`
+  - **Password**: `tes12345`
+  - *(Sudah dilengkapi data lamaran aktif tahap Wawancara & Penawaran)*
+- **Daftar Akun Contoh Lainnya** (Password: `password`):
   - `adit.pratama@gmail.com` (Status: *Screening*)
   - `candra.wijaya@gmail.com` (Status: *Wawancara*)
   - `eko.setiawan@gmail.com` (Status: *Offer*)
   - `gita.mariana@gmail.com` (Status: *Diterima*)
   - `hendra.putra@gmail.com` (Status: *Ditolak*)
-- **Password**: `password` (berlaku untuk semua akun pelamar dummy)
 - **Registrasi Baru**: Anda juga dapat membuat akun pelamar baru di `http://127.0.0.1:8000/kandidat/register`.
 
 ---
