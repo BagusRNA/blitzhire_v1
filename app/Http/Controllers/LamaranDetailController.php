@@ -93,24 +93,55 @@ class LamaranDetailController extends Controller
         $jadwalTerakhir = $lamaran->wawancara->last();
 
         $pengajuanPelamar = null;
-        if ($jadwalTerakhir && str_contains($jadwalTerakhir->catatan ?? '', '[Pengajuan Jadwal Ulang Pelamar]')) {
-            $pengajuanPelamar = $jadwalTerakhir->catatan;
+        $usulanPelamar = null;
+        $rescheduleCount = 0;
+
+        foreach ($lamaran->wawancara as $w) {
+            if (preg_match_all('/\[Pengajuan Jadwal Ulang Pelamar(?:\s*#(\d+))?\]/i', $w->catatan ?? '', $matches)) {
+                foreach ($matches[1] as $num) {
+                    if ($num !== '') {
+                        $rescheduleCount = max($rescheduleCount, (int)$num);
+                    } else {
+                        $rescheduleCount++;
+                    }
+                }
+            }
+        }
+
+        if ($jadwalTerakhir && str_contains($jadwalTerakhir->catatan ?? '', '[Pengajuan Jadwal Ulang Pelamar')) {
+            // Ambil bagian [Pengajuan Jadwal Ulang Pelamar...]
+            if (preg_match('/\[Pengajuan Jadwal Ulang Pelamar[^\]]*\]:[^\n]*/i', $jadwalTerakhir->catatan, $m)) {
+                $pengajuanPelamar = $m[0];
+            } else {
+                $pengajuanPelamar = $jadwalTerakhir->catatan;
+            }
+
+            // Ekstrak usulan tanggal dan waktu
+            preg_match('/Tanggal Baru:\s*([^|]+)/i', $pengajuanPelamar, $matchTgl);
+            preg_match('/Waktu:\s*([^|\n]+)/i', $pengajuanPelamar, $matchWkt);
+            $usulanPelamar = [
+                'tanggal' => isset($matchTgl[1]) ? trim($matchTgl[1]) : null,
+                'waktu'   => isset($matchWkt[1]) ? trim($matchWkt[1]) : null,
+            ];
         }
 
         return Inertia::render('HRD/Kandidat/JadwalUlang', [
             'lamaran'          => $lamaran,
             'jadwalTerakhir'   => $jadwalTerakhir,
             'pengajuanPelamar' => $pengajuanPelamar,
+            'usulanPelamar'    => $usulanPelamar,
+            'rescheduleCount'  => $rescheduleCount,
         ]);
     }
 
-    /** POST: Simpan jadwal ulang */
+    /** POST: Simpan jadwal ulang (Setujui / Atur Jadwal Baru) */
     public function reschedule(Request $request, $id_lamaran)
     {
         $request->validate([
             'tanggal_wawancara' => 'required',
             'link_meeting'      => 'nullable|string|max:225',
             'format_wawancara'  => 'nullable|in:Online,Offline',
+            'alasan_hrd'        => 'nullable|string|max:500',
         ]);
 
         $lamaran = $this->getLamaran($id_lamaran);
@@ -118,6 +149,11 @@ class LamaranDetailController extends Controller
         // Tandai jadwal lama sebagai dibatalkan
         $lamaran->wawancara()->whereIn('status_wawancara', ['Terjadwal', 'Ditunda'])
             ->update(['status_wawancara' => 'Dibatalkan']);
+
+        $catatan = 'Pengajuan jadwal ulang disetujui HRD.';
+        if ($request->alasan_hrd) {
+            $catatan .= ' Catatan: ' . $request->alasan_hrd;
+        }
 
         JadwalWawancara::create([
             'id_lamaran'        => $id_lamaran,
@@ -127,11 +163,38 @@ class LamaranDetailController extends Controller
             'status_wawancara'  => 'Terjadwal',
             'format_wawancara'  => $request->format_wawancara ?? 'Online',
             'link_meeting'      => $request->link_meeting,
-            'catatan'           => 'Jadwal wawancara telah disesuaikan oleh HRD.',
+            'catatan'           => $catatan,
         ]);
 
         return redirect()->route('hrd.manajemen-kandidat')
-            ->with('success', 'Jadwal wawancara berhasil diperbarui.');
+            ->with('success', 'Jadwal wawancara berhasil disetujui dan diperbarui.');
+    }
+
+    /** POST: Tolak pengajuan jadwal ulang dari pelamar */
+    public function rejectReschedule(Request $request, $id_lamaran)
+    {
+        $request->validate([
+            'alasan_penolakan' => 'required|string|max:500',
+        ], [
+            'alasan_penolakan.required' => 'Mohon cantumkan alasan penolakan jadwal ulang.',
+        ]);
+
+        $lamaran = $this->getLamaran($id_lamaran);
+        $wawancara = $lamaran->wawancara->where('status_wawancara', 'Ditunda')->last()
+            ?? $lamaran->wawancara->last();
+
+        if ($wawancara) {
+            $catatanLama = $wawancara->catatan ? trim($wawancara->catatan) . "\n" : '';
+            $catatanBaru = $catatanLama . "[Pengajuan Jadwal Ulang Ditolak HRD]: Alasan: " . $request->alasan_penolakan;
+
+            $wawancara->update([
+                'status_wawancara' => 'Terjadwal',
+                'catatan'          => $catatanBaru,
+            ]);
+        }
+
+        return redirect()->route('hrd.manajemen-kandidat')
+            ->with('success', 'Pengajuan jadwal ulang pelamar berhasil ditolak.');
     }
 
     // ─── 4. Pengecekan Status Wawancara ──────────────────────────────────────

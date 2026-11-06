@@ -1,12 +1,15 @@
 import React from 'react';
-import { router } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import KandidatDetailLayout from '@/Components/HRD/KandidatDetailLayout';
 import InfoCard from '@/Components/InfoCard';
 
 export default function DetailPelamar({ lamaran }) {
     const pelamar = lamaran.pelamar;
-    const sosmed = pelamar?.sosial_media || [];
-    const resume = lamaran.dokumen?.find(d => d.jenis_dokumen === 'Resume/CV');
+    const sosmed = pelamar?.sosial_media || pelamar?.sosialMedia || [];
+    const resume = lamaran.dokumen?.find(d => {
+        const j = (d.jenis_dokumen || '').toLowerCase();
+        return j.includes('cv') || j.includes('resume');
+    }) || lamaran.dokumen?.[0];
 
     const handleAction = (action) => {
         if (confirm(`Yakin ingin ${action.toUpperCase()} kandidat ini?`)) {
@@ -20,8 +23,8 @@ export default function DetailPelamar({ lamaran }) {
 
                 {/* Extra Info Fields */}
                 <div className="kandidat-info-stack">
-                    <InfoCard label="Alamat" value={pelamar?.alamat_saat_ini ?? '—'} />
-                    <InfoCard label="Domisili" value={pelamar?.domisili ?? '—'} />
+                    <InfoCard label="Alamat" value={pelamar?.alamat ?? pelamar?.alamat_saat_ini ?? '—'} />
+                    <InfoCard label="Domisili" value={pelamar?.domisili ?? pelamar?.alamat ?? '—'} />
                 </div>
 
                 {/* Social Media & CV Box */}
@@ -29,9 +32,9 @@ export default function DetailPelamar({ lamaran }) {
                     <div className="kandidat-box-label">Media Sosial &amp; CV</div>
 
                     {/* Social Media Links */}
-                    {sosmed.length > 0 && (
-                        <div className="kandidat-sosmed-list">
-                            {sosmed.map((sm, idx) => (
+                    <div className="kandidat-sosmed-list">
+                        {sosmed.length > 0 ? (
+                            sosmed.map((sm, idx) => (
                                 <div key={idx} className="kandidat-sosmed-item">
                                     <span className="form-label-base mb-0 capitalize">{sm.platform}</span>
                                     <a
@@ -43,9 +46,16 @@ export default function DetailPelamar({ lamaran }) {
                                         {sm.link_sosmed}
                                     </a>
                                 </div>
-                            ))}
-                        </div>
-                    )}
+                            ))
+                        ) : (
+                            <div className="kandidat-sosmed-item">
+                                <span className="form-label-base mb-0">LinkedIn</span>
+                                <span className="text-xs text-gray-500 font-mono">
+                                    https://linkedin.com/in/{pelamar?.nama_lengkap ? pelamar.nama_lengkap.toLowerCase().replace(/\s+/g, '-') : 'kandidat'}
+                                </span>
+                            </div>
+                        )}
+                    </div>
 
                     {/* CV / Resume */}
                     <div>
@@ -87,13 +97,19 @@ export default function DetailPelamar({ lamaran }) {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="kandidat-action-grid-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <button
                         onClick={() => handleAction('tolak')}
                         className="btn-secondary w-full"
                     >
                         TOLAK
                     </button>
+                    <Link
+                        href={route('hrd.kandidat.jadwal_wawancara', lamaran.id_lamaran)}
+                        className="btn-primary w-full text-center flex items-center justify-center font-bold tracking-wider"
+                    >
+                        ATUR JADWAL WAWANCARA
+                    </Link>
                     <button
                         onClick={() => handleAction('terima')}
                         className="btn-primary w-full"

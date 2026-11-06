@@ -33,7 +33,7 @@ export default function PelamarRegister() {
                     <h2 className="text-xl font-bold text-black mb-1 uppercase tracking-tight">Join BlitzHire</h2>
                     <p className="text-gray-500 text-xs mb-6">Fill in your details to start your application journey.</p>
 
-                    <form onSubmit={submit} className="space-y-4">
+                    <form onSubmit={submit} className="space-y-4" noValidate>
                         <div className="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label className="form-label-base">Full Name</label>
@@ -43,9 +43,8 @@ export default function PelamarRegister() {
                                     onChange={e => setData('nama_lengkap', e.target.value)}
                                     placeholder="Budi Santoso"
                                     className="form-input-base"
-                                    required
                                 />
-                                {errors.nama_lengkap && <p className="form-error-base">{errors.nama_lengkap}</p>}
+                                {errors.nama_lengkap && <p className="form-error-base text-red-600 font-bold text-xs mt-1">{errors.nama_lengkap}</p>}
                             </div>
 
                             <div>
@@ -56,9 +55,8 @@ export default function PelamarRegister() {
                                     onChange={e => setData('email', e.target.value)}
                                     placeholder="budi@gmail.com"
                                     className="form-input-base"
-                                    required
                                 />
-                                {errors.email && <p className="form-error-base">{errors.email}</p>}
+                                {errors.email && <p className="form-error-base text-red-600 font-bold text-xs mt-1">{errors.email}</p>}
                             </div>
                         </div>
 
@@ -71,9 +69,8 @@ export default function PelamarRegister() {
                                     onChange={e => setData('kata_sandi', e.target.value)}
                                     placeholder="Minimum 8 characters"
                                     className="form-input-base"
-                                    required
                                 />
-                                {errors.kata_sandi && <p className="form-error-base">{errors.kata_sandi}</p>}
+                                {errors.kata_sandi && <p className="form-error-base text-red-600 font-bold text-xs mt-1">{errors.kata_sandi}</p>}
                             </div>
 
                             <div>
@@ -84,8 +81,8 @@ export default function PelamarRegister() {
                                     onChange={e => setData('kata_sandi_confirmation', e.target.value)}
                                     placeholder="Repeat password"
                                     className="form-input-base"
-                                    required
                                 />
+                                {errors.kata_sandi_confirmation && <p className="form-error-base text-red-600 font-bold text-xs mt-1">{errors.kata_sandi_confirmation}</p>}
                             </div>
                         </div>
 
@@ -98,9 +95,8 @@ export default function PelamarRegister() {
                                     onChange={e => setData('nomor_hp', e.target.value)}
                                     placeholder="08123456789"
                                     className="form-input-base"
-                                    required
                                 />
-                                {errors.nomor_hp && <p className="form-error-base">{errors.nomor_hp}</p>}
+                                {errors.nomor_hp && <p className="form-error-base text-red-600 font-bold text-xs mt-1">{errors.nomor_hp}</p>}
                             </div>
 
                             <div>
@@ -109,7 +105,6 @@ export default function PelamarRegister() {
                                     value={data.pendidikan_terakhir}
                                     onChange={e => setData('pendidikan_terakhir', e.target.value)}
                                     className="form-select-base"
-                                    required
                                 >
                                     <option value="">Select education</option>
                                     <option>S3 / Doktor</option>
@@ -120,7 +115,7 @@ export default function PelamarRegister() {
                                     <option>D3</option>
                                     <option>SMA/SMK</option>
                                 </select>
-                                {errors.pendidikan_terakhir && <p className="form-error-base">{errors.pendidikan_terakhir}</p>}
+                                {errors.pendidikan_terakhir && <p className="form-error-base text-red-600 font-bold text-xs mt-1">{errors.pendidikan_terakhir}</p>}
                             </div>
                         </div>
 
@@ -132,9 +127,8 @@ export default function PelamarRegister() {
                                 rows={2}
                                 placeholder="Jl. Sudirman No. 1, Jakarta"
                                 className="form-textarea-base"
-                                required
                             />
-                            {errors.alamat && <p className="form-error-base">{errors.alamat}</p>}
+                            {errors.alamat && <p className="form-error-base text-red-600 font-bold text-xs mt-1">{errors.alamat}</p>}
                         </div>
 
                         <button

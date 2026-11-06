@@ -29,9 +29,13 @@ export default function PelamarLogin({ status }) {
                     <h2 className="text-xl font-bold text-black mb-1 uppercase tracking-tight">Welcome back</h2>
                     <p className="text-gray-500 text-xs mb-6">Track your applications and manage your career journey.</p>
 
-                    {status && <div className="mb-4 p-3 bg-gray-100 border border-gray-800 text-black rounded text-xs font-bold">{status}</div>}
+                    {status && (
+                        <div className="mb-4 p-3 bg-green-50 border border-green-600 text-green-900 rounded text-xs font-bold flex items-center justify-between">
+                            <span>{status}</span>
+                        </div>
+                    )}
 
-                    <form onSubmit={submit} className="space-y-4">
+                    <form onSubmit={submit} className="space-y-4" noValidate>
                         <div>
                             <label className="auth-label-light">Email Address</label>
                             <input
@@ -39,28 +43,26 @@ export default function PelamarLogin({ status }) {
                                 type="email"
                                 value={data.email}
                                 onChange={e => setData('email', e.target.value)}
-                                required
                                 placeholder="budi@gmail.com"
                                 className="auth-input-light"
                             />
-                            {errors.email && <p className="form-error-base">{errors.email}</p>}
+                            {errors.email && <p className="form-error-base text-red-600 font-bold text-xs mt-1">{errors.email}</p>}
                         </div>
 
                         <div>
                             <div className="flex justify-between items-center mb-1">
                                 <label className="auth-label-light mb-0">Password</label>
-                                <Link href={route('password.request')} className="text-xs text-black font-bold hover:underline">Forgot password?</Link>
+                                <Link href={route('password.request', { role: 'pelamar' })} className="text-xs text-black font-bold hover:underline">Lupa Sandi?</Link>
                             </div>
                             <input
                                 id="kata_sandi"
                                 type="password"
                                 value={data.kata_sandi}
                                 onChange={e => setData('kata_sandi', e.target.value)}
-                                required
                                 placeholder="••••••••"
                                 className="auth-input-light"
                             />
-                            {errors.kata_sandi && <p className="form-error-base">{errors.kata_sandi}</p>}
+                            {errors.kata_sandi && <p className="form-error-base text-red-600 font-bold text-xs mt-1">{errors.kata_sandi}</p>}
                         </div>
 
                         <button

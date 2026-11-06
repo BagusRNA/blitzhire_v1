@@ -29,7 +29,7 @@ class Lamaran extends Model
 
     public function wawancara()
     {
-        return $this->hasMany(JadwalWawancara::class, 'id_lamaran', 'id_lamaran');
+        return $this->hasMany(JadwalWawancara::class, 'id_lamaran', 'id_lamaran')->orderBy('id_wawancara', 'asc');
     }
 
     public function penawaran()

@@ -26,14 +26,31 @@ class PelamarAuthController extends Controller
      */
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email'      => 'required|email',
-            'kata_sandi' => 'required|string',
-        ]);
+        $email = trim((string)$request->input('email', ''));
+        $password = trim((string)$request->input('kata_sandi', ''));
+
+        if ($email === '' && $password === '') {
+            return back()->withErrors([
+                'email' => 'Kredensial tidak boleh kosong!',
+                'kata_sandi' => 'Kredensial tidak boleh kosong!',
+            ])->onlyInput('email');
+        }
+
+        if ($email === '') {
+            return back()->withErrors([
+                'email' => 'Email tidak boleh kosong!',
+            ])->onlyInput('email');
+        }
+
+        if ($password === '') {
+            return back()->withErrors([
+                'kata_sandi' => 'Password harus diisi!',
+            ])->onlyInput('email');
+        }
 
         if (Auth::guard('pelamar')->attempt([
-            'email'    => $credentials['email'],
-            'password' => $credentials['kata_sandi'],
+            'email'    => $email,
+            'password' => $password,
         ], $request->boolean('remember'))) {
 
             $request->session()->regenerate();
@@ -41,7 +58,8 @@ class PelamarAuthController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
+            'email' => 'Email atau password tidak sesuai!',
+            'kata_sandi' => 'Email atau password tidak sesuai!',
         ])->onlyInput('email');
     }
 
@@ -58,27 +76,53 @@ class PelamarAuthController extends Controller
      */
     public function register(Request $request)
     {
-        $data = $request->validate([
-            'nama_lengkap'         => 'required|string|max:100',
-            'email'                => 'required|email|max:100|unique:pelamar,email',
-            'kata_sandi'           => 'required|string|min:8|confirmed',
-            'nomor_hp'             => 'required|string|max:20',
-            'alamat'               => 'required|string|max:255',
-            'pendidikan_terakhir'  => 'required|string|max:100',
+        $fields = [
+            'nama_lengkap'            => $request->input('nama_lengkap', ''),
+            'email'                   => $request->input('email', ''),
+            'kata_sandi'              => $request->input('kata_sandi', ''),
+            'kata_sandi_confirmation' => $request->input('kata_sandi_confirmation', ''),
+            'nomor_hp'                => $request->input('nomor_hp', ''),
+            'alamat'                  => $request->input('alamat', ''),
+            'pendidikan_terakhir'     => $request->input('pendidikan_terakhir', ''),
+        ];
+
+        // TC23, TC24, TC25, TC26: check if any required field is empty
+        foreach ($fields as $key => $val) {
+            if (trim((string)$val) === '') {
+                return back()->withErrors([$key => 'Semua field harus diisi!'])->withInput();
+            }
+        }
+
+        // TC27: Strict email validation (reject pelamar@gmail.om or invalid domain extensions)
+        $email = trim((string)$request->input('email', ''));
+        $validDomainRegex = '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|id|co\.id|org|net|edu|gov|io|ac\.id)$/i';
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !preg_match($validDomainRegex, $email)) {
+            return back()->withErrors(['email' => 'Email tidak valid!'])->withInput();
+        }
+
+        if (Pelamar::where('email', $email)->exists()) {
+            return back()->withErrors(['email' => 'Email sudah terdaftar!'])->withInput();
+        }
+
+        // TC28: Check confirm password mismatch
+        if ($request->input('kata_sandi') !== $request->input('kata_sandi_confirmation')) {
+            return back()->withErrors([
+                'kata_sandi_confirmation' => 'Password salah!',
+                'kata_sandi' => 'Password salah!',
+            ])->withInput();
+        }
+
+        Pelamar::create([
+            'nama_lengkap'        => $fields['nama_lengkap'],
+            'email'               => $email,
+            'kata_sandi'          => Hash::make($fields['kata_sandi']),
+            'nomor_hp'            => $fields['nomor_hp'],
+            'alamat'              => $fields['alamat'],
+            'pendidikan_terakhir' => $fields['pendidikan_terakhir'],
         ]);
 
-        $pelamar = Pelamar::create([
-            'nama_lengkap'        => $data['nama_lengkap'],
-            'email'               => $data['email'],
-            'kata_sandi'          => Hash::make($data['kata_sandi']),
-            'nomor_hp'            => $data['nomor_hp'],
-            'alamat'              => $data['alamat'],
-            'pendidikan_terakhir' => $data['pendidikan_terakhir'],
-        ]);
-
-        Auth::guard('pelamar')->login($pelamar);
-
-        return redirect()->route('pelamar.dashboard');
+        // TC22: Redirect to login with success pop-up "Akun berhasil dibuat!"
+        return redirect()->route('pelamar.auth.showLogin')->with('status', 'Akun berhasil dibuat!');
     }
 
     /**

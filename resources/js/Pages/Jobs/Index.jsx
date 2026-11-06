@@ -19,15 +19,8 @@ export default function JobBoard({ jobs, filterOptions = [], filters = {} }) {
     const [search, setSearch] = useState(filters.search ?? "");
     const [selectedType, setSelectedType] = useState(normalizeType(filters.type));
 
-    const defaultTypes = ["Semua", "Full-Time", "Internship/PKL"];
-    const incomingTypes = (filterOptions || []).filter(
-        (type) =>
-            type &&
-            type !== "Semua" &&
-            type !== "Full-Time" &&
-            type !== "Internship/PKL"
-    );
-    const typeOptions = Array.from(new Set([...defaultTypes, ...incomingTypes]));
+    // Only allow Full-Time and Internship/PKL as per design requirements (IR26)
+    const typeOptions = ["Semua", "Full-Time", "Internship/PKL"];
 
     const applyFilter = (nextSearch = search, nextType = selectedType) => {
         const params = {};

@@ -33,7 +33,7 @@ export default function HRDLogin({ status }) {
 
                     {status && <div className="mb-4 p-3 bg-gray-100 border border-gray-800 text-black rounded text-xs font-bold">{status}</div>}
 
-                    <form onSubmit={submit} className="space-y-4">
+                    <form onSubmit={submit} className="space-y-4" noValidate>
                         <div>
                             <label className="auth-label-dark">Email Address</label>
                             <input
@@ -41,25 +41,28 @@ export default function HRDLogin({ status }) {
                                 type="email"
                                 value={data.email}
                                 onChange={e => setData('email', e.target.value)}
-                                required
                                 placeholder="hrd@blitzhire.com"
                                 className="auth-input-dark"
                             />
-                            {errors.email && <p className="form-error-base">{errors.email}</p>}
+                            {errors.email && <p className="form-error-base text-red-600 font-bold text-xs mt-1">{errors.email}</p>}
                         </div>
 
                         <div>
-                            <label className="auth-label-dark">Password</label>
+                            <div className="flex justify-between items-center mb-1">
+                                <label className="auth-label-dark mb-0">Password</label>
+                                <Link href={route('password.request', { role: 'hrd' })} className="text-xs text-black font-bold hover:underline">
+                                    Lupa Sandi?
+                                </Link>
+                            </div>
                             <input
                                 id="kata_sandi"
                                 type="password"
                                 value={data.kata_sandi}
                                 onChange={e => setData('kata_sandi', e.target.value)}
-                                required
                                 placeholder="••••••••"
                                 className="auth-input-dark"
                             />
-                            {errors.kata_sandi && <p className="form-error-base">{errors.kata_sandi}</p>}
+                            {errors.kata_sandi && <p className="form-error-base text-red-600 font-bold text-xs mt-1">{errors.kata_sandi}</p>}
                         </div>
 
                         <button

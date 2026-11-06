@@ -24,15 +24,32 @@ class HRDAuthController extends Controller
      */
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email'      => 'required|email',
-            'kata_sandi' => 'required|string',
-        ]);
+        $email = trim((string)$request->input('email', ''));
+        $password = trim((string)$request->input('kata_sandi', ''));
+
+        if ($email === '' && $password === '') {
+            return back()->withErrors([
+                'email' => 'Kredensial tidak boleh kosong!',
+                'kata_sandi' => 'Kredensial tidak boleh kosong!',
+            ])->onlyInput('email');
+        }
+
+        if ($email === '') {
+            return back()->withErrors([
+                'email' => 'Email tidak boleh kosong!',
+            ])->onlyInput('email');
+        }
+
+        if ($password === '') {
+            return back()->withErrors([
+                'kata_sandi' => 'Password harus diisi!',
+            ])->onlyInput('email');
+        }
 
         // Attempt login against the 'hrd' guard
         if (Auth::guard('hrd')->attempt([
-            'email'    => $credentials['email'],
-            'password' => $credentials['kata_sandi'],
+            'email'    => $email,
+            'password' => $password,
         ], $request->boolean('remember'))) {
 
             $request->session()->regenerate();
@@ -40,7 +57,8 @@ class HRDAuthController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
+            'email' => 'Email atau password tidak sesuai!',
+            'kata_sandi' => 'Email atau password tidak sesuai!',
         ])->onlyInput('email');
     }
 

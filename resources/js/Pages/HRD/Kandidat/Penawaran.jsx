@@ -22,6 +22,32 @@ export default function Penawaran({ lamaran }) {
                 {/* Form Fields */}
                 <div className="kandidat-form-grid-2">
                     <div className="form-group">
+                        <label className="form-label-base">Posisi Kerja</label>
+                        <input
+                            type="text"
+                            placeholder="Frontend Engineer"
+                            className="form-input-base"
+                            value={data.posisi_kerja}
+                            onChange={e => setData('posisi_kerja', e.target.value)}
+                            required
+                        />
+                        {errors.posisi_kerja && <span className="form-error-base">{errors.posisi_kerja}</span>}
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label-base">Lokasi Kerja</label>
+                        <input
+                            type="text"
+                            placeholder="Bandung"
+                            className="form-input-base"
+                            value={data.lokasi_kerja}
+                            onChange={e => setData('lokasi_kerja', e.target.value)}
+                            required
+                        />
+                        {errors.lokasi_kerja && <span className="form-error-base">{errors.lokasi_kerja}</span>}
+                    </div>
+
+                    <div className="form-group">
                         <label className="form-label-base">Tipe Penawaran</label>
                         <select
                             className="form-select-base"
@@ -36,16 +62,23 @@ export default function Penawaran({ lamaran }) {
                     </div>
 
                     <div className="form-group">
-                        <label className="form-label-base">Gaji</label>
+                        <label className="form-label-base">Nominal Gaji</label>
                         <input
                             type="number"
-                            placeholder="IDR 5x.xxx.xxx"
+                            placeholder="7000000"
                             className="form-input-base"
                             value={data.nominal_gaji}
                             onChange={e => setData('nominal_gaji', e.target.value)}
                             required
                         />
                         {errors.nominal_gaji && <span className="form-error-base">{errors.nominal_gaji}</span>}
+                    </div>
+                </div>
+
+                <div className="card-base-sm my-2">
+                    <div className="text-xs text-gray-600 flex justify-between">
+                        <span>Status Penawaran: <strong className="text-black">Menunggu Respon Kandidat</strong></span>
+                        <span>Tanggal: <strong className="text-black">{new Date().toLocaleDateString('id-ID')}</strong></span>
                     </div>
                 </div>
 

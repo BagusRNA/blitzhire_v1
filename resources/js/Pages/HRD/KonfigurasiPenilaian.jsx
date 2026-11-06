@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import HRDLayout from '@/Layouts/HRDLayout';
 
 export default function KonfigurasiPenilaian({
     thresholds: initialThresholds = [],
     categories: initialCategories = [],
+    errors = {},
+    flash = {},
 }) {
     const defaultThresholds = [
         { label: 'Skor Minimum Lanjut Screening', key: 'min_screening', value: '60%' },
@@ -28,18 +30,33 @@ export default function KonfigurasiPenilaian({
 
     const [newKeywordInputs, setNewKeywordInputs] = useState({});
     const [savedMessage, setSavedMessage] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(null);
 
+    // IR18 / TC67: Menambahkan keyword baru dengan validasi duplikasi
     const handleAddChip = (catIndex) => {
         const text = (newKeywordInputs[catIndex] || '').trim();
-        if (!text) return;
-
-        const updated = [...categories];
-        if (!updated[catIndex].chips.includes(text)) {
-            updated[catIndex].chips.push(text);
-            setCategories(updated);
+        if (!text) {
+            setErrorMessage('Tidak boleh kosong!');
+            alert('Tidak boleh kosong!');
+            return;
         }
 
+        const cat = categories[catIndex];
+        const isDuplicate = cat.chips.some(
+            (c) => c.toLowerCase() === text.toLowerCase()
+        );
+
+        if (isDuplicate) {
+            setErrorMessage('Kategori sudah ada!');
+            alert('Kategori sudah ada!');
+            return;
+        }
+
+        const updated = [...categories];
+        updated[catIndex].chips = [...updated[catIndex].chips, text];
+        setCategories(updated);
         setNewKeywordInputs({ ...newKeywordInputs, [catIndex]: '' });
+        setErrorMessage(null);
     };
 
     const handleRemoveChip = (catIndex, chipToRemove) => {
@@ -50,9 +67,72 @@ export default function KonfigurasiPenilaian({
         setCategories(updated);
     };
 
+    // IR16, IR17, IR19, IR20: Validasi saat menyimpan konfigurasi
     const handleSave = () => {
-        setSavedMessage(true);
-        setTimeout(() => setSavedMessage(false), 3000);
+        setErrorMessage(null);
+
+        // 1. Validasi Batas Skor Otomatis (IR16 & IR17 / TC64 & TC65)
+        for (const item of thresholds) {
+            const cleanStr = String(item.value ?? '').trim().replace('%', '');
+            if (cleanStr === '') {
+                setErrorMessage('Tidak boleh kosong!');
+                alert('Tidak boleh kosong!');
+                return;
+            }
+
+            const val = Number(cleanStr);
+            if (isNaN(val) || val < 0 || val > 100) {
+                setErrorMessage('Nilai tidak valid!');
+                alert('Nilai tidak valid!');
+                return;
+            }
+        }
+
+        // 2. Validasi Kategori & Bobot Penilaian (IR19 & IR20 / TC69 & TC70)
+        let totalWeight = 0;
+        for (const cat of categories) {
+            const cleanStr = String(cat.weight ?? '').trim().replace('%', '');
+            if (cleanStr === '') {
+                setErrorMessage('Tidak boleh kosong!');
+                alert('Tidak boleh kosong!');
+                return;
+            }
+
+            const w = Number(cleanStr);
+            if (isNaN(w) || w < 0 || w > 100) {
+                setErrorMessage('Konfigurasi tidak valid!');
+                alert('Konfigurasi tidak valid!');
+                return;
+            }
+            totalWeight += w;
+        }
+
+        if (Math.round(totalWeight) !== 100) {
+            setErrorMessage('Konfigurasi tidak valid!');
+            alert('Konfigurasi tidak valid!');
+            return;
+        }
+
+        // Kirim ke server
+        router.post(
+            route('hrd.konfigurasi-penilaian.store'),
+            { thresholds, categories },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setErrorMessage(null);
+                    setSavedMessage(true);
+                    setTimeout(() => setSavedMessage(false), 3000);
+                },
+                onError: (err) => {
+                    const firstError = Object.values(err)[0];
+                    if (firstError) {
+                        setErrorMessage(firstError);
+                        alert(firstError);
+                    }
+                },
+            }
+        );
     };
 
     return (
@@ -64,8 +144,32 @@ export default function KonfigurasiPenilaian({
                     <div className="hrd-page-inline-line"></div>
                 </div>
 
-                {savedMessage && (
-                    <div className="hrd-flash-success flex items-center justify-between">
+                {/* Error Banner */}
+                {errorMessage && (
+                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 text-xs font-bold rounded flex items-center justify-between">
+                        <span>⚠️ {errorMessage}</span>
+                        <button
+                            type="button"
+                            onClick={() => setErrorMessage(null)}
+                            className="text-red-700 hover:text-red-900"
+                        >
+                            ×
+                        </button>
+                    </div>
+                )}
+
+                {/* Server Error from props */}
+                {errors && Object.keys(errors).length > 0 && (
+                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 text-xs font-bold rounded">
+                        {Object.values(errors).map((err, i) => (
+                            <div key={i}>⚠️ {err}</div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Success Banner */}
+                {(savedMessage || flash?.success) && (
+                    <div className="hrd-flash-success flex items-center justify-between mb-4">
                         <span>Konfigurasi penilaian berhasil disimpan.</span>
                     </div>
                 )}
@@ -81,7 +185,7 @@ export default function KonfigurasiPenilaian({
                             <div key={item.key || idx} className="hrd-config-row">
                                 <span className="hrd-config-label">{item.label}</span>
                                 <div className="hrd-config-swatch">
-                                    <span className="hrd-config-swatch-box"></span>
+                                    {/* IR15: Extraneous swatch square removed */}
                                     <input
                                         type="text"
                                         value={item.value}
@@ -90,7 +194,8 @@ export default function KonfigurasiPenilaian({
                                             updated[idx].value = e.target.value;
                                             setThresholds(updated);
                                         }}
-                                        className="hrd-config-value w-24 text-right bg-transparent border-b border-gray-400 focus:outline-none focus:border-black"
+                                        placeholder="0%"
+                                        className="hrd-config-value w-24 text-right bg-transparent border-b border-gray-400 focus:outline-none focus:border-black font-semibold"
                                     />
                                 </div>
                             </div>
@@ -109,7 +214,7 @@ export default function KonfigurasiPenilaian({
                             <div key={cat.name} className="hrd-config-row items-start">
                                 <div className="hrd-config-input-wrap flex-1">
                                     <span className="hrd-config-label">{cat.name}</span>
-                                    <div className="hrd-config-pill-row mt-2">
+                                    <div className="hrd-config-pill-row mt-2 flex flex-wrap gap-1.5 items-center">
                                         {cat.chips.map((chip) => (
                                             <span
                                                 key={chip}
@@ -151,7 +256,7 @@ export default function KonfigurasiPenilaian({
                                             <button
                                                 type="button"
                                                 onClick={() => handleAddChip(idx)}
-                                                className="hrd-config-add-btn text-xs py-1 px-2.5 rounded"
+                                                className="hrd-config-add-btn text-xs py-1 px-2.5 rounded bg-black text-white hover:bg-gray-800"
                                             >
                                                 +
                                             </button>
@@ -168,7 +273,8 @@ export default function KonfigurasiPenilaian({
                                             updated[idx].weight = e.target.value;
                                             setCategories(updated);
                                         }}
-                                        className="hrd-config-value w-20 text-right bg-transparent border-b border-gray-400 focus:outline-none focus:border-black"
+                                        placeholder="0%"
+                                        className="hrd-config-value w-20 text-right bg-transparent border-b border-gray-400 focus:outline-none focus:border-black font-semibold"
                                     />
                                 </div>
                             </div>

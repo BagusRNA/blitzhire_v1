@@ -2,9 +2,7 @@
 
 use App\Http\Controllers\Auth\HRDAuthController;
 use App\Http\Controllers\Auth\PelamarAuthController;
-// Default Breeze controllers kept for password reset flow
-use App\Http\Controllers\Auth\NewPasswordController;
-use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\LupaSandiController;
 use Illuminate\Support\Facades\Route;
 
 // ─── HRD Auth ──────────────────────────────────────────────
@@ -33,15 +31,11 @@ Route::prefix('kandidat')->name('pelamar.auth.')->group(function () {
     });
 });
 
-// ─── Password Reset (shared, uses default users table) ─────
-// Note: For custom guard password resets, further customisation is needed.
+// ─── Password Reset / Lupa Sandi ───────────────────────────
 Route::middleware('guest')->group(function () {
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-        ->name('password.request');
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-        ->name('password.email');
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-        ->name('password.reset');
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-        ->name('password.store');
+    Route::get('forgot-password', [LupaSandiController::class, 'showForm'])->name('password.request');
+    Route::post('forgot-password', [LupaSandiController::class, 'sendOtp'])->name('password.email');
+    Route::post('forgot-password/verify-otp', [LupaSandiController::class, 'verifyOtp'])->name('password.verifyOtp');
+    Route::post('forgot-password/reset', [LupaSandiController::class, 'resetPassword'])->name('password.resetPassword');
+    Route::post('reset-password', [LupaSandiController::class, 'resetPassword'])->name('password.store');
 });

@@ -353,7 +353,7 @@ export default function KelolaJob({ jobs = [], filters = {} }) {
                     <div className="modal-backdrop-dark">
                         <div className="modal-card-base">
                             <div className="modal-header-line">
-                                <h3 className="modal-header-title">Hapus Lowongan</h3>
+                                <h3 className="modal-header-title">Yakin ingin dihapus?</h3>
                                 <button
                                     onClick={() => setDeleteModalJob(null)}
                                     className="modal-header-close"
@@ -363,11 +363,11 @@ export default function KelolaJob({ jobs = [], filters = {} }) {
                             </div>
                             <div className="py-2">
                                 <p className="text-sm text-gray-700 leading-relaxed">
-                                    Apakah Anda yakin ingin menghapus lowongan{' '}
+                                    Yakin ingin dihapus? Lowongan{' '}
                                     <strong className="text-black font-bold">
                                         "{deleteModalJob.judul_lowongan || deleteModalJob.posisi}"
-                                    </strong>
-                                    ? Data lamaran terkait lowongan ini juga akan terhapus.
+                                    </strong>{' '}
+                                    akan dihapus secara permanen dari sistem.
                                 </p>
                             </div>
                             <div className="flex justify-end gap-3 pt-5 mt-3 border-t border-gray-100">
@@ -383,7 +383,7 @@ export default function KelolaJob({ jobs = [], filters = {} }) {
                                     onClick={confirmDelete}
                                     className="btn-danger py-2 px-4 text-xs font-bold"
                                 >
-                                    Hapus Sekarang
+                                    Ya
                                 </button>
                             </div>
                         </div>

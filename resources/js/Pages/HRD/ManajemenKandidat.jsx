@@ -236,11 +236,28 @@ export default function ManajemenKandidat({ lamaran = [], flash }) {
                                                     {/* Footer row */}
                                                     <div className="hrd-kcard-footer">
                                                         {col.key ===
-                                                            "Wawancara" &&
-                                                        dtStr ? (
-                                                            <span className="hrd-kcard-meta">
-                                                                {dtStr}
-                                                            </span>
+                                                            "Wawancara" ? (
+                                                            <div className="flex flex-col gap-0.5">
+                                                                {dtStr && (
+                                                                    <span className="hrd-kcard-meta">
+                                                                        {dtStr}
+                                                                    </span>
+                                                                )}
+                                                                {(() => {
+                                                                    const latest = item.wawancara?.[item.wawancara.length - 1];
+                                                                    const isConfirmed = latest?.status_wawancara === 'Terkonfirmasi' ||
+                                                                        Boolean(latest?.catatan && latest.catatan.includes('[Pelamar]: Telah mengonfirmasi'));
+                                                                    const isDitunda = latest?.status_wawancara === 'Ditunda' ||
+                                                                        Boolean(latest?.catatan && latest.catatan.includes('[Pengajuan Jadwal Ulang'));
+                                                                    if (isConfirmed) {
+                                                                        return <span className="text-[10px] font-bold text-green-700 bg-green-100 px-1.5 py-0.5 rounded w-fit">✓ Terkonfirmasi</span>;
+                                                                    }
+                                                                    if (isDitunda) {
+                                                                        return <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded w-fit">⚠️ Reschedule</span>;
+                                                                    }
+                                                                    return null;
+                                                                })()}
+                                                            </div>
                                                         ) : col.key ===
                                                           "Penawaran" ? (
                                                             <span className="hrd-kcard-meta">

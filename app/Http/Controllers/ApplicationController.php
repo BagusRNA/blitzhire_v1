@@ -18,6 +18,9 @@ class ApplicationController extends Controller
         $request->validate([
             'file_dokumen' => 'required|file|mimes:pdf|max:5120', // max 5MB
             'jenis_dokumen' => 'required|string|max:100'
+        ], [
+            'file_dokumen.mimes' => 'Format file tidak tepat! Harap unggah berkas berformat PDF.',
+            'file_dokumen.required' => 'CV wajib diunggah.',
         ]);
 
         $pelamarId = auth('pelamar')->id();

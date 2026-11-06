@@ -24,6 +24,13 @@ export default function Dashboard({ lamarans, lamaran }) {
         alasan: ''
     });
 
+    // Reject offer negotiation modal state (IR24 / TC35)
+    const [rejectOfferModal, setRejectOfferModal] = useState({
+        open: false,
+        id_penawaran: null,
+        alasan: ''
+    });
+
     // Modal state for docs
     const [uploadModal, setUploadModal] = useState({ open: false, lamaranId: null, docType: 'KTP', file: null });
 
@@ -36,7 +43,7 @@ export default function Dashboard({ lamarans, lamaran }) {
     ];
 
     const formatIndoDate = (dateStr) => {
-        if (!dateStr) return '02 Agustus 2026';
+        if (!dateStr) return '—';
         try {
             const d = new Date(dateStr);
             if (isNaN(d.getTime())) return dateStr;
@@ -50,21 +57,33 @@ export default function Dashboard({ lamarans, lamaran }) {
     };
 
     const formatInterviewTime = (dateStr) => {
-        if (!dateStr) return '10.00 - 11.00 WIB';
+        if (!dateStr) return '—';
         try {
+            const cleanStr = String(dateStr).replace('T', ' ');
+            const parts = cleanStr.split(' ');
+            if (parts.length >= 2 && parts[1].includes(':')) {
+                const timeParts = parts[1].split(':');
+                const hour = parseInt(timeParts[0], 10);
+                const min = timeParts[1] || '00';
+                if (!isNaN(hour)) {
+                    const startHour = String(hour).padStart(2, '0');
+                    const endHour = String((hour + 1) % 24).padStart(2, '0');
+                    return `${startHour}.${min} - ${endHour}.${min} WIB`;
+                }
+            }
             const d = new Date(dateStr);
-            if (isNaN(d.getTime())) return '10.00 - 11.00 WIB';
+            if (isNaN(d.getTime())) return '—';
             const hours = String(d.getHours()).padStart(2, '0');
             const minutes = String(d.getMinutes()).padStart(2, '0');
             const endHour = String((d.getHours() + 1) % 24).padStart(2, '0');
             return `${hours}.${minutes} - ${endHour}.${minutes} WIB`;
         } catch {
-            return '10.00 - 11.00 WIB';
+            return '—';
         }
     };
 
     const formatRefNo = (id) => {
-        if (!id) return '#0001';
+        if (!id) return '—';
         return `#${String(id).padStart(4, '0')}`;
     };
 
@@ -106,14 +125,17 @@ export default function Dashboard({ lamarans, lamaran }) {
     const isRejected = (activeApp?.status_lamaran || '').toLowerCase().includes('ditolak');
 
     const latestInterview = activeApp?.wawancara && activeApp.wawancara.length > 0
-        ? activeApp.wawancara[activeApp.wawancara.length - 1]
+        ? [...activeApp.wawancara]
+            .sort((a, b) => (Number(a.id_wawancara) || 0) - (Number(b.id_wawancara) || 0))
+            .filter(w => w.status_wawancara !== 'Dibatalkan')
+            .pop() || activeApp.wawancara[activeApp.wawancara.length - 1]
         : null;
     const latestOffer = activeApp?.penawaran && activeApp.penawaran.length > 0
         ? activeApp.penawaran[activeApp.penawaran.length - 1]
         : null;
 
     const parseRescheduleInfo = (catatan) => {
-        if (!catatan || !catatan.includes('[Pengajuan Jadwal Ulang Pelamar]')) return null;
+        if (!catatan || !catatan.includes('[Pengajuan Jadwal Ulang Pelamar')) return null;
         try {
             const matchTanggal = catatan.match(/Tanggal Baru:\s*([^|\n]+)/i);
             const matchWaktu = catatan.match(/Waktu:\s*([^|\n]+)/i);
@@ -128,7 +150,41 @@ export default function Dashboard({ lamarans, lamaran }) {
         }
     };
 
+    const getRescheduleCount = (app) => {
+        if (!app?.wawancara) return 0;
+        let count = 0;
+        app.wawancara.forEach(w => {
+            const matches = (w.catatan || '').match(/\[Pengajuan Jadwal Ulang Pelamar(?:\s*#(\d+))?\]/gi);
+            if (matches) {
+                matches.forEach(m => {
+                    const numMatch = m.match(/#(\d+)/);
+                    if (numMatch) {
+                        count = Math.max(count, parseInt(numMatch[1], 10));
+                    } else {
+                        count++;
+                    }
+                });
+            }
+        });
+        return count;
+    };
+
+    const currentRescheduleCount = getRescheduleCount(activeApp);
+    const maxRescheduleLimit = 3;
+    const isRescheduleLimitReached = currentRescheduleCount >= maxRescheduleLimit;
+
+    const parseRejectionInfo = (catatan) => {
+        if (!catatan || !catatan.includes('[Pengajuan Jadwal Ulang Ditolak HRD]')) return null;
+        try {
+            const match = catatan.match(/\[Pengajuan Jadwal Ulang Ditolak HRD\]:\s*Alasan:\s*([^\n]+)/i);
+            return match ? match[1].trim() : 'Jadwal wawancara tetap mengikuti jadwal semula.';
+        } catch {
+            return null;
+        }
+    };
+
     const rescheduleInfo = parseRescheduleInfo(latestInterview?.catatan);
+    const rejectionInfo = parseRejectionInfo(latestInterview?.catatan);
     const isPendingReschedule = latestInterview?.status_wawancara === 'Ditunda' || Boolean(rescheduleInfo && latestInterview?.status_wawancara !== 'Selesai');
     const isInterviewAccepted = latestInterview?.catatan?.includes('[Pelamar]: Telah mengonfirmasi kehadiran');
 
@@ -228,7 +284,7 @@ export default function Dashboard({ lamarans, lamaran }) {
                 bannerTitle: 'TAHAP WAWANCARA',
                 bannerBadge: isScheduled ? 'TERJADWAL' : 'WAWANCARA',
                 boxTitle: 'UNDANGAN WAWANCARA',
-                boxDesc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                boxDesc: latestInterview?.catatan || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
                 interviewDone: false,
             };
         }
@@ -294,26 +350,49 @@ export default function Dashboard({ lamarans, lamaran }) {
     // Actions
     const handleAcceptOffer = (id_penawaran) => {
         if (confirm('Apakah Anda yakin ingin menerima penawaran pekerjaan ini?')) {
-            router.post(`/pelamar/offers/${id_penawaran}/accept`);
+            router.post(`/pelamar/offers/${id_penawaran}/accept`, {}, {
+                onSuccess: () => {
+                    alert('Penawaran diterima!');
+                }
+            });
         }
     };
 
     const handleRejectOffer = (id_penawaran) => {
-        if (confirm('Apakah Anda yakin ingin menolak tawaran pekerjaan ini?')) {
-            router.post(`/pelamar/offers/${id_penawaran}/reject`);
-        }
+        setRejectOfferModal({
+            open: true,
+            id_penawaran: id_penawaran,
+            alasan: ''
+        });
     };
 
     const handleAcceptInterview = (id_wawancara) => {
         if (confirm('Konfirmasi kehadiran Anda pada jadwal wawancara ini?')) {
-            router.post(`/pelamar/interviews/${id_wawancara}/accept`);
+            router.post(`/pelamar/interviews/${id_wawancara}/accept`, {}, {
+                onSuccess: () => {
+                    alert('Undangan wawancara berhasil dikonfirmasi!');
+                }
+            });
         }
     };
 
     const handleOpenReschedule = () => {
+        if (isPendingReschedule) {
+            alert('Pengajuan jadwal ulang Anda sedang diproses oleh HRD. Harap menunggu konfirmasi sebelum mengajukan perubahan baru.');
+            return;
+        }
+        if (isRescheduleLimitReached) {
+            alert('Batas maksimal pengajuan jadwal ulang telah tercapai (maksimal 3 kali). Anda tidak dapat mengajukan perubahan jadwal lagi.');
+            return;
+        }
+        let initialWaktu = rescheduleInfo?.waktu || '';
+        const timeMatch = initialWaktu.match(/(\d{1,2})[:.](\d{2})/);
+        if (timeMatch) {
+            initialWaktu = `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
+        }
         setRescheduleForm({
             tanggal_baru: rescheduleInfo?.tanggal || '',
-            waktu_baru: rescheduleInfo?.waktu || '',
+            waktu_baru: initialWaktu,
             alasan: rescheduleInfo?.alasan || ''
         });
         setIsRescheduling(true);
@@ -322,17 +401,30 @@ export default function Dashboard({ lamarans, lamaran }) {
     const handleSubmitRescheduleForm = (e) => {
         e.preventDefault();
         if (!latestInterview) return;
+        if (isRescheduleLimitReached) {
+            alert('Batas maksimal pengajuan jadwal ulang telah tercapai (maksimal 3 kali).');
+            return;
+        }
         if (!rescheduleForm.tanggal_baru.trim() || !rescheduleForm.waktu_baru.trim()) {
             alert('Mohon isi tanggal baru dan waktu yang diinginkan.');
             return;
         }
+        const formattedWaktu = rescheduleForm.waktu_baru.includes('WIB')
+            ? rescheduleForm.waktu_baru
+            : `${rescheduleForm.waktu_baru} WIB`;
+
         router.post(`/pelamar/interviews/${latestInterview.id_wawancara}/reschedule`, {
             tanggal_baru: rescheduleForm.tanggal_baru,
-            waktu_baru: rescheduleForm.waktu_baru,
+            waktu_baru: formattedWaktu,
             alasan: rescheduleForm.alasan || ''
         }, {
             onSuccess: () => {
                 setIsRescheduling(false);
+                alert('Pengajuan berhasil diajukan!');
+            },
+            onError: (err) => {
+                const msg = err.reschedule || Object.values(err)[0];
+                if (msg) alert(msg);
             }
         });
     };
@@ -475,6 +567,21 @@ export default function Dashboard({ lamarans, lamaran }) {
                         {/* Section Header */}
                         <SectionHeader title="Detail Lamaran" />
 
+                        {applications.length === 0 ? (
+                            <div className="card-base text-center py-16 px-6">
+                                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center text-2xl">
+                                    📄
+                                </div>
+                                <h3 className="text-base font-bold text-gray-800 mb-2">Belum Ada Lamaran Aktif</h3>
+                                <p className="text-xs text-gray-500 max-w-md mx-auto mb-6 leading-relaxed">
+                                    Akun Anda belum memiliki riwayat pengajuan lamaran pekerjaan. Seluruh tahapan seleksi rekrutmen akan ditampilkan secara otomatis di sini setelah Anda melamar lowongan.
+                                </p>
+                                <a href="/jobs" className="btn-primary inline-flex items-center text-xs px-5 py-2.5">
+                                    Jelajahi Lowongan Kerja →
+                                </a>
+                            </div>
+                        ) : (
+                            <>
                         {/* 1. TAHAPAN REKRUTMEN (Stepper / Interactive Stage Tracker) */}
                         <div className="pelamar-stepper-card">
                             <div className="pelamar-stepper-head">
@@ -753,30 +860,37 @@ export default function Dashboard({ lamarans, lamaran }) {
                                                             </div>
                                                         )}
 
-                                                        <div className="space-y-2 pt-1">
-                                                            <button
-                                                                type="button"
-                                                                onClick={handleOpenReschedule}
-                                                                className="btn-primary w-full text-xs !py-3 tracking-widest font-bold"
-                                                            >
-                                                                AJUKAN JADWAL ULANG
-                                                            </button>
+                                                        <div className="p-3 bg-amber-50 border border-amber-300 rounded text-xs text-amber-900 font-medium leading-relaxed">
+                                                            ⚠️ <strong>Pengajuan Sedang Diproses</strong>: Anda telah mengajukan perubahan jadwal wawancara. Mohon menunggu konfirmasi jadwal baru dari tim HRD sebelum mengajukan perubahan lainnya.
                                                         </div>
                                                     </div>
                                                 ) : (
                                                     /* Active Reschedule Form (Image 1) */
                                                     <form onSubmit={handleSubmitRescheduleForm} className="space-y-4">
+                                                        <div className="flex items-center justify-between p-2.5 bg-gray-50 border border-gray-300 rounded text-xs">
+                                                            <span className="font-semibold text-gray-700">Batas Pengajuan Jadwal Ulang:</span>
+                                                            <span className={`font-extrabold px-2 py-0.5 rounded text-[11px] ${isRescheduleLimitReached ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-white text-gray-900 border border-gray-400'}`}>
+                                                                Pengajuan ke-{Math.min(currentRescheduleCount + 1, maxRescheduleLimit)} dari {maxRescheduleLimit} kali
+                                                            </span>
+                                                        </div>
+
+                                                        {isRescheduleLimitReached && (
+                                                            <div className="p-3 bg-red-50 border border-red-300 rounded text-xs text-red-800 font-semibold">
+                                                                ⚠️ Batas maksimal 3 kali pengajuan jadwal ulang telah tercapai. Anda tidak dapat mengajukan lagi.
+                                                            </div>
+                                                        )}
+
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                             <div className="border border-gray-800 rounded-lg p-3 sm:p-4 bg-white">
                                                                 <label className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">
                                                                     TANGGAL BARU
                                                                 </label>
                                                                 <input
-                                                                    type="text"
-                                                                    placeholder="HH/BB/TTTT"
+                                                                    type="date"
                                                                     value={rescheduleForm.tanggal_baru}
                                                                     onChange={(e) => setRescheduleForm({ ...rescheduleForm, tanggal_baru: e.target.value })}
-                                                                    className="w-full text-sm font-bold text-black border-none p-0 focus:ring-0 focus:outline-none placeholder-gray-400 bg-transparent"
+                                                                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                                                                    className="w-full text-sm font-bold text-black border-none p-0 focus:ring-0 focus:outline-none bg-transparent cursor-pointer"
                                                                     required
                                                                 />
                                                             </div>
@@ -785,11 +899,11 @@ export default function Dashboard({ lamarans, lamaran }) {
                                                                     WAKTU
                                                                 </label>
                                                                 <input
-                                                                    type="text"
-                                                                    placeholder="JJ.MM - JJ.MM"
+                                                                    type="time"
                                                                     value={rescheduleForm.waktu_baru}
                                                                     onChange={(e) => setRescheduleForm({ ...rescheduleForm, waktu_baru: e.target.value })}
-                                                                    className="w-full text-sm font-bold text-black border-none p-0 focus:ring-0 focus:outline-none placeholder-gray-400 bg-transparent"
+                                                                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                                                                    className="w-full text-sm font-bold text-black border-none p-0 focus:ring-0 focus:outline-none bg-transparent cursor-pointer"
                                                                     required
                                                                 />
                                                             </div>
@@ -832,11 +946,34 @@ export default function Dashboard({ lamarans, lamaran }) {
                                         ) : latestInterview ? (
                                             /* OPTION B: SCHEDULED (Image 3) OR COMPLETED (Image 2) */
                                             <>
+                                                {/* Rejection Alert from HRD if previous reschedule was rejected */}
+                                                {rejectionInfo && (
+                                                    <div className="p-3 bg-red-50 border border-red-300 rounded text-xs text-red-900 leading-relaxed space-y-1">
+                                                        <div className="flex items-center gap-1.5 font-bold text-red-800">
+                                                            <span>⚠️</span>
+                                                            <span>Pengajuan Jadwal Ulang Sebelumnya Ditolak HRD</span>
+                                                        </div>
+                                                        <p className="text-red-700">
+                                                            <strong>Alasan:</strong> {rejectionInfo}
+                                                        </p>
+                                                        <p className="text-[11px] text-gray-600">
+                                                            Jadwal wawancara Anda tetap mengikuti tanggal dan waktu yang tertera di bawah.
+                                                        </p>
+                                                    </div>
+                                                )}
+
                                                 {/* Sub-box: UNDANGAN WAWANCARA or Note ! */}
                                                 <div className="card-base-sm">
-                                                    <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">
-                                                        {latestInterview.status_wawancara === 'Selesai' ? 'Note !' : 'UNDANGAN WAWANCARA'}
-                                                    </h4>
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <h4 className="text-xs font-bold text-gray-800 uppercase tracking-wider">
+                                                            {latestInterview.status_wawancara === 'Selesai' ? 'Note !' : 'UNDANGAN WAWANCARA'}
+                                                        </h4>
+                                                        {latestInterview.status_wawancara === 'Selesai' && (
+                                                            <span className="text-[10px] font-bold uppercase bg-green-100 text-green-800 border border-green-300 px-2 py-0.5 rounded">
+                                                                ✓ Selesai
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                     <p className="text-xs text-gray-600 leading-relaxed">
                                                         {stageInfo.boxDesc}
                                                     </p>
@@ -844,6 +981,11 @@ export default function Dashboard({ lamarans, lamaran }) {
 
                                                 {/* 2-column info cards */}
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                    <InfoCard
+                                                        label="STATUS WAWANCARA"
+                                                        value={latestInterview.status_wawancara}
+                                                        valueClassName={latestInterview.status_wawancara === 'Selesai' ? 'text-green-700 font-bold uppercase' : 'font-bold uppercase text-black'}
+                                                    />
                                                     <InfoCard
                                                         label="TANGGAL WAWANCARA"
                                                         value={formatIndoDate(latestInterview.tanggal_wawancara)}
@@ -909,13 +1051,24 @@ export default function Dashboard({ lamarans, lamaran }) {
                                                 {/* Bottom action buttons for Terjadwal: [ JADWAL ULANG ] and [ TERIMA ] (Image 3) */}
                                                 {latestInterview.status_wawancara === 'Terjadwal' && (
                                                     <div className="grid grid-cols-2 gap-3 pt-1">
-                                                        <button
-                                                            type="button"
-                                                            onClick={handleOpenReschedule}
-                                                            className="btn-primary w-full text-xs !py-3 tracking-widest font-bold"
-                                                        >
-                                                            JADWAL ULANG
-                                                        </button>
+                                                        {isRescheduleLimitReached ? (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => alert('Batas maksimal pengajuan jadwal ulang telah tercapai (3 kali). Anda tidak dapat mengajukan lagi.')}
+                                                                className="btn-secondary w-full text-xs !py-3 tracking-widest font-bold opacity-75 cursor-not-allowed"
+                                                                title="Batas maksimal 3 kali pengajuan telah tercapai"
+                                                            >
+                                                                BATAS JADWAL ULANG HABIS (3/3)
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                type="button"
+                                                                onClick={handleOpenReschedule}
+                                                                className="btn-primary w-full text-xs !py-3 tracking-widest font-bold"
+                                                            >
+                                                                JADWAL ULANG {currentRescheduleCount > 0 ? `(${currentRescheduleCount}/3)` : ''}
+                                                            </button>
+                                                        )}
                                                         <button
                                                             type="button"
                                                             onClick={() => handleAcceptInterview(latestInterview.id_wawancara)}
@@ -1220,7 +1373,8 @@ export default function Dashboard({ lamarans, lamaran }) {
 
                             </div>
                         </div>
-
+                        </>
+                        )}
                     </div>
 
                 </div>
@@ -1279,6 +1433,64 @@ export default function Dashboard({ lamarans, lamaran }) {
                             className="btn-primary-sm"
                         >
                             Unggah File
+                        </button>
+                    </div>
+                </form>
+            </PelamarModal>
+
+            {/* ══ MODAL TOLAK / NEGOSIASI PENAWARAN (IR24 / TC35) ══ */}
+            <PelamarModal
+                isOpen={rejectOfferModal.open}
+                onClose={() => setRejectOfferModal({ open: false, id_penawaran: null, alasan: '' })}
+                title="Tolak Penawaran / Negosiasi"
+                maxWidth="max-w-md"
+            >
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        router.post(
+                            `/pelamar/offers/${rejectOfferModal.id_penawaran}/reject`,
+                            { alasan: rejectOfferModal.alasan },
+                            {
+                                onSuccess: () => {
+                                    setRejectOfferModal({ open: false, id_penawaran: null, alasan: '' });
+                                    alert('Negoisasi telah terkirim!');
+                                },
+                            }
+                        );
+                    }}
+                    className="space-y-4"
+                >
+                    <div>
+                        <label className="text-xs font-bold text-gray-700 block mb-1">
+                            Alasan Penolakan / Negosiasi:
+                        </label>
+                        <textarea
+                            rows="4"
+                            className="w-full text-xs border border-gray-300 rounded p-2 focus:ring-1 focus:ring-black"
+                            placeholder="Tuliskan alasan penolakan atau usulan penyesuaian gaji/benefit yang Anda harapkan..."
+                            value={rejectOfferModal.alasan}
+                            onChange={(e) =>
+                                setRejectOfferModal({ ...rejectOfferModal, alasan: e.target.value })
+                            }
+                            required
+                        />
+                    </div>
+                    <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setRejectOfferModal({ open: false, id_penawaran: null, alasan: '' })
+                            }
+                            className="btn-secondary-sm"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            className="btn-primary-sm"
+                        >
+                            Kirim
                         </button>
                     </div>
                 </form>

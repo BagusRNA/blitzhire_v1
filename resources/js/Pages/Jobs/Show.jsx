@@ -34,6 +34,22 @@ export default function JobShow({ job }) {
             <Header />
 
             <main className="job-detail-main">
+                <div className="mb-4">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            if (window.history.length > 1) {
+                                window.history.back();
+                            } else {
+                                router.visit('/hrd/kelola-job');
+                            }
+                        }}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-700 hover:text-black py-1.5 px-3 rounded border border-gray-300 bg-white shadow-xs transition"
+                    >
+                        ← Kembali
+                    </button>
+                </div>
+
                 <div className="job-detail-card">
                     <div className="job-detail-header">
                         <div>
@@ -148,8 +164,20 @@ export default function JobShow({ job }) {
                         <label className="form-label-base">Upload CV (PDF, Max 5MB)</label>
                         <input 
                             type="file" 
-                            accept=".pdf"
-                            onChange={e => setData('file_dokumen', e.target.files[0])}
+                            accept=".pdf,application/pdf"
+                            onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+                                    if (!isPdf) {
+                                        alert('Format file tidak tepat! Harap unggah berkas berformat PDF.');
+                                        e.target.value = '';
+                                        setData('file_dokumen', null);
+                                        return;
+                                    }
+                                    setData('file_dokumen', file);
+                                }
+                            }}
                             className="form-input-file" 
                             required
                         />

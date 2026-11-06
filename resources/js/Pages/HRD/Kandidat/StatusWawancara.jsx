@@ -23,10 +23,26 @@ export default function StatusWawancara({ lamaran, jadwalTerakhir, pengajuanPela
         : 'Belum ada jadwal';
 
     const isDitunda = jadwalTerakhir?.status_wawancara === 'Ditunda' || Boolean(pengajuanPelamar);
+    const isConfirmed = jadwalTerakhir?.status_wawancara === 'Terkonfirmasi' ||
+        Boolean(jadwalTerakhir?.catatan && jadwalTerakhir.catatan.includes('[Pelamar]: Telah mengonfirmasi'));
 
     return (
         <KandidatDetailLayout title="Jadwal Wawancara" lamaran={lamaran}>
             <div className="kandidat-form-flow">
+
+                {/* Confirmed Attendance Alert */}
+                {isConfirmed && (
+                    <div className="bg-green-50 border border-green-500 rounded p-4 mb-4 shadow-xs">
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="font-extrabold text-[10px] uppercase bg-green-200 text-green-900 px-2 py-0.5 rounded tracking-wider">
+                                ✓ Terkonfirmasi Hadir
+                            </span>
+                        </div>
+                        <p className="text-xs text-green-900 font-medium">
+                            Kandidat telah mengonfirmasi bahwa mereka akan hadir pada sesi wawancara sesuai jadwal.
+                        </p>
+                    </div>
+                )}
 
                 {/* Reschedule Alert from Pelamar */}
                 {isDitunda && (

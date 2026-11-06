@@ -28,21 +28,14 @@ export default function EditLowongan({ lowongan = null, isEdit = false }) {
     const validateStep1 = () => {
         const errs = {};
         if (!data.posisi.trim()) errs.posisi = 'Posisi pekerjaan wajib diisi.';
-        if (!data.departemen.trim()) errs.departemen = 'Departemen wajib diisi.';
-        if (!data.lokasi.trim()) errs.lokasi = 'Lokasi pekerjaan wajib diisi.';
-        if (!data.tanggal_buka) errs.tanggal_buka = 'Tanggal buka wajib diisi.';
-        if (!data.tanggal_tutup) errs.tanggal_tutup = 'Tanggal tutup wajib diisi.';
-
         setStep1Errors(errs);
         return Object.keys(errs).length === 0;
     };
 
     // Step 2 Validation
     const validateStep2 = () => {
-        const errs = {};
-        if (!data.deskripsi.trim()) errs.deskripsi = 'Deskripsi lowongan wajib diisi.';
-        setStep2Errors(errs);
-        return Object.keys(errs).length === 0;
+        setStep2Errors({});
+        return true;
     };
 
     const handleNextToStep2 = (e) => {
@@ -55,19 +48,40 @@ export default function EditLowongan({ lowongan = null, isEdit = false }) {
 
     const handleNextToStep3 = (e) => {
         if (e) e.preventDefault();
-        if (validateStep2()) {
-            setCurrentStep(3);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        setCurrentStep(3);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Form Submission on Step 3
+    // Form Submission on Step 3: Publish
     const handleSubmit = (e) => {
         if (e) e.preventDefault();
+
+        // Validate all required fields for publishing (TC33, TC35)
+        const isMissingFields = !data.posisi.trim() || !data.departemen.trim() || !data.lokasi.trim() || !data.deskripsi.trim();
+        if (isMissingFields) {
+            alert('Masih ada kolom kosong!');
+            return;
+        }
+
         if (isEdit && lowongan?.id_lowongan) {
             put(`/hrd/lowongan/${lowongan.id_lowongan}`);
         } else {
             post('/hrd/lowongan');
+        }
+    };
+
+    // Save as Draft on Step 3 (TC36, TC37)
+    const handleSaveDraft = (e) => {
+        if (e) e.preventDefault();
+        const payload = {
+            ...data,
+            posisi: data.posisi || data.judul_lowongan || 'Draft Lowongan',
+            status_lowongan: 'Draft',
+        };
+        if (isEdit && lowongan?.id_lowongan) {
+            router.put(`/hrd/lowongan/${lowongan.id_lowongan}`, payload);
+        } else {
+            router.post('/hrd/lowongan', payload);
         }
     };
 
@@ -540,7 +554,7 @@ export default function EditLowongan({ lowongan = null, isEdit = false }) {
                         </div>
 
                         {/* Navigation Footer Step 3 */}
-                        <div className="hrd-wizard-footer">
+                        <div className="hrd-wizard-footer flex items-center justify-between">
                             <button
                                 type="button"
                                 onClick={() => setCurrentStep(2)}
@@ -548,18 +562,28 @@ export default function EditLowongan({ lowongan = null, isEdit = false }) {
                             >
                                 ← KEMBALI KE DESKRIPSI
                             </button>
-                            <button
-                                type="button"
-                                onClick={handleSubmit}
-                                disabled={processing}
-                                className="hrd-wizard-forward-btn"
-                            >
-                                {processing
-                                    ? 'MENYIMPAN...'
-                                    : isEdit
-                                    ? 'EDIT LOWONGAN'
-                                    : 'PUBLISH LOWONGAN'}
-                            </button>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={handleSaveDraft}
+                                    disabled={processing}
+                                    className="btn-secondary font-bold text-xs py-2.5 px-4 tracking-wider uppercase border border-gray-400 hover:bg-gray-100"
+                                >
+                                    SIMPAN DRAFT
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleSubmit}
+                                    disabled={processing}
+                                    className="hrd-wizard-forward-btn"
+                                >
+                                    {processing
+                                        ? 'MENYIMPAN...'
+                                        : isEdit
+                                        ? 'EDIT LOWONGAN'
+                                        : 'POSTING JOB'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}

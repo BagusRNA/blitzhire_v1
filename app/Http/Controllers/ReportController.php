@@ -12,7 +12,7 @@ class ReportController extends Controller
      */
     public function laporanPelamar()
     {
-        $data = Lamaran::with(['pelamar', 'lowongan'])
+        $data = Lamaran::with(['pelamar', 'lowongan', 'dokumen'])
             ->orderBy('tanggal_lamaran', 'desc')
             ->get();
 

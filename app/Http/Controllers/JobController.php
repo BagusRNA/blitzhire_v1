@@ -43,24 +43,7 @@ class JobController extends Controller
 
         $jobs = $query->orderBy('created_at', 'desc')->get();
 
-        $defaultTypes = ['Full-Time', 'Internship/PKL'];
-        $dbTypes = Lowongan::query()
-            ->where('status_lowongan', 'Aktif')
-            ->select('tipe_pekerjaan')
-            ->distinct()
-            ->pluck('tipe_pekerjaan')
-            ->filter()
-            ->values()
-            ->all();
-
-        $otherTypes = [];
-        foreach ($dbTypes as $item) {
-            if ($item !== 'Full-Time' && !in_array(strtolower($item), ['magang', 'pkl', 'magang / pkl', 'internship', 'internship/pkl'])) {
-                $otherTypes[] = $item;
-            }
-        }
-
-        $filterOptions = array_values(array_unique(array_merge($defaultTypes, $otherTypes)));
+        $filterOptions = ['Full-Time', 'Internship/PKL'];
 
         return Inertia::render('Jobs/Index', [
             'jobs' => $jobs,
@@ -138,21 +121,34 @@ class JobController extends Controller
     {
         $hrdId = auth('hrd')->id() ?? \App\Models\HRD::first()?->id_hrd ?? 1;
 
-        $validated = $request->validate([
+        $isDraft = ($request->input('status_lowongan') === 'Draft');
+
+        $rules = [
             'posisi' => 'required|string|max:100',
-            'departemen' => 'required|string|max:100',
-            'lokasi' => 'required|string|max:100',
-            'tipe_pekerjaan' => 'required|string|max:50',
+            'departemen' => $isDraft ? 'nullable|string|max:100' : 'required|string|max:100',
+            'lokasi' => $isDraft ? 'nullable|string|max:100' : 'required|string|max:100',
+            'tipe_pekerjaan' => 'nullable|string|max:50',
             'status_lowongan' => 'required|string|in:Aktif,Draft,Tutup',
             'gaji_min' => 'nullable|numeric|min:0',
             'gaji_max' => 'nullable|numeric|min:0',
             'tanggal_buka' => 'nullable|date',
             'tanggal_tutup' => 'nullable|date',
-            'deskripsi' => 'required|string',
+            'deskripsi' => $isDraft ? 'nullable|string' : 'required|string',
             'kualifikasi' => 'nullable|string',
+        ];
+
+        $validated = $request->validate($rules, [
+            'posisi.required' => 'Posisi pekerjaan wajib diisi.',
+            'departemen.required' => 'Masih ada kolom kosong!',
+            'lokasi.required' => 'Masih ada kolom kosong!',
+            'deskripsi.required' => 'Masih ada kolom kosong!',
         ]);
 
         $validated['id_hrd'] = $hrdId;
+        $validated['departemen'] = $validated['departemen'] ?? 'Product & Design';
+        $validated['lokasi'] = $validated['lokasi'] ?? '-';
+        $validated['tipe_pekerjaan'] = $validated['tipe_pekerjaan'] ?? 'Full-Time';
+        $validated['deskripsi'] = $validated['deskripsi'] ?? '-';
         $validated['gaji_min'] = $validated['gaji_min'] ?? 0;
         $validated['gaji_max'] = $validated['gaji_max'] ?? 0;
         $validated['kualifikasi'] = $validated['kualifikasi'] ?? '-';
@@ -176,7 +172,8 @@ class JobController extends Controller
             // Ignore if already exists or table structure variation
         }
 
-        return redirect()->route('hrd.kelola-job')->with('success', 'Lowongan berhasil diterbitkan.');
+        $msg = $isDraft ? 'Berhasil tersimpan sebagai draft!' : 'Lowongan berhasil di posting!';
+        return redirect()->route('hrd.kelola-job')->with('success', $msg);
     }
 
     public function edit($id_lowongan)
@@ -193,27 +190,41 @@ class JobController extends Controller
     {
         $lowongan = Lowongan::where('id_lowongan', $id_lowongan)->firstOrFail();
 
-        $validated = $request->validate([
+        $isDraft = ($request->input('status_lowongan') === 'Draft');
+
+        $rules = [
             'posisi' => 'required|string|max:100',
-            'departemen' => 'required|string|max:100',
-            'lokasi' => 'required|string|max:100',
-            'tipe_pekerjaan' => 'required|string|max:50',
+            'departemen' => $isDraft ? 'nullable|string|max:100' : 'required|string|max:100',
+            'lokasi' => $isDraft ? 'nullable|string|max:100' : 'required|string|max:100',
+            'tipe_pekerjaan' => 'nullable|string|max:50',
             'status_lowongan' => 'required|string|in:Aktif,Draft,Tutup',
             'gaji_min' => 'nullable|numeric|min:0',
             'gaji_max' => 'nullable|numeric|min:0',
             'tanggal_buka' => 'nullable|date',
             'tanggal_tutup' => 'nullable|date',
-            'deskripsi' => 'required|string',
+            'deskripsi' => $isDraft ? 'nullable|string' : 'required|string',
             'kualifikasi' => 'nullable|string',
+        ];
+
+        $validated = $request->validate($rules, [
+            'posisi.required' => 'Posisi pekerjaan wajib diisi.',
+            'departemen.required' => 'Masih ada kolom kosong!',
+            'lokasi.required' => 'Masih ada kolom kosong!',
+            'deskripsi.required' => 'Masih ada kolom kosong!',
         ]);
 
+        $validated['departemen'] = $validated['departemen'] ?? $lowongan->departemen ?? 'Product & Design';
+        $validated['lokasi'] = $validated['lokasi'] ?? $lowongan->lokasi ?? '-';
+        $validated['tipe_pekerjaan'] = $validated['tipe_pekerjaan'] ?? $lowongan->tipe_pekerjaan ?? 'Full-Time';
+        $validated['deskripsi'] = $validated['deskripsi'] ?? $lowongan->deskripsi ?? '-';
         $validated['gaji_min'] = $validated['gaji_min'] ?? 0;
         $validated['gaji_max'] = $validated['gaji_max'] ?? 0;
         $validated['kualifikasi'] = $validated['kualifikasi'] ?? $lowongan->kualifikasi ?? '-';
 
         $lowongan->update($validated);
 
-        return redirect()->route('hrd.kelola-job')->with('success', 'Lowongan berhasil diperbarui.');
+        $msg = $isDraft ? 'Berhasil tersimpan sebagai draft!' : 'Perubahan berhasil disimpan!';
+        return redirect()->route('hrd.kelola-job')->with('success', $msg);
     }
 
     public function destroy($id_lowongan)
@@ -221,6 +232,6 @@ class JobController extends Controller
         $lowongan = Lowongan::where('id_lowongan', $id_lowongan)->firstOrFail();
         $lowongan->delete();
 
-        return redirect()->route('hrd.kelola-job')->with('success', 'Lowongan berhasil dihapus.');
+        return redirect()->route('hrd.kelola-job')->with('success', 'Berhasil dihapus!');
     }
 }

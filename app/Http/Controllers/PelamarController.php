@@ -44,7 +44,7 @@ class PelamarController extends Controller
         $lamaran = Lamaran::findOrFail($penawaran->id_lamaran);
         $lamaran->update(['status_lamaran' => 'Diterima']);
 
-        return back()->with('success', 'Selamat! Anda telah menerima penawaran kerja ini.');
+        return back()->with('success', 'Penawaran diterima!');
     }
 
     /**
@@ -61,7 +61,7 @@ class PelamarController extends Controller
         $lamaran = Lamaran::findOrFail($penawaran->id_lamaran);
         $lamaran->update(['status_lamaran' => 'Ditolak']);
 
-        return back()->with('success', 'Anda telah menolak penawaran kerja.');
+        return back()->with('success', 'Negoisasi telah terkirim!');
     }
 
     /**
@@ -78,7 +78,7 @@ class PelamarController extends Controller
             'catatan' => $catatanExisting . '[Pelamar]: Telah mengonfirmasi kehadiran wawancara.'
         ]);
 
-        return back()->with('success', 'Undangan wawancara berhasil dikonfirmasi. Harap hadir tepat waktu!');
+        return back()->with('success', 'Jadwal wawancara berhasil dikonfirmasi.');
     }
 
     /**
@@ -96,11 +96,36 @@ class PelamarController extends Controller
             $q->where('id_pelamar', auth('pelamar')->id());
         })->findOrFail($id_wawancara);
 
-        $alasanText = $request->alasan ? " | Alasan: " . $request->alasan : "";
-        $catatanReschedule = "[Pengajuan Jadwal Ulang Pelamar]: Tanggal Baru: " . $request->tanggal_baru . " | Waktu: " . $request->waktu_baru . $alasanText;
+        // IR22: Kunci agar pelamar tidak bisa mengajukan berulang kali sebelum HRD merespon
+        if ($wawancara->status_wawancara === 'Ditunda') {
+            return back()->withErrors(['reschedule' => 'Pengajuan jadwal ulang Anda sedang diproses oleh HRD. Anda tidak dapat mengajukan lagi sampai HRD memberikan respon jadwal baru.']);
+        }
 
-        // Clean previous reschedule notes if re-submitting
-        $cleanedCatatan = preg_replace('/\[Pengajuan Jadwal Ulang Pelamar\]:.*$/s', '', $wawancara->catatan ?? '');
+        // Batasi pengajuan jadwal ulang maksimal 3 kali per lamaran
+        $rescheduleCount = 0;
+        $allWawancara = JadwalWawancara::where('id_lamaran', $wawancara->id_lamaran)->get();
+        foreach ($allWawancara as $w) {
+            if (preg_match_all('/\[Pengajuan Jadwal Ulang Pelamar(?:\s*#(\d+))?\]/i', $w->catatan ?? '', $matches)) {
+                foreach ($matches[1] as $num) {
+                    if ($num !== '') {
+                        $rescheduleCount = max($rescheduleCount, (int)$num);
+                    } else {
+                        $rescheduleCount++;
+                    }
+                }
+            }
+        }
+
+        if ($rescheduleCount >= 3) {
+            return back()->withErrors(['reschedule' => 'Batas maksimal pengajuan jadwal ulang telah tercapai (maksimal 3 kali). Anda tidak dapat mengajukan perubahan jadwal lagi.']);
+        }
+
+        $nextCount = $rescheduleCount + 1;
+        $alasanText = $request->alasan ? " | Alasan: " . $request->alasan : "";
+        $catatanReschedule = "[Pengajuan Jadwal Ulang Pelamar #{$nextCount}]: Tanggal Baru: " . $request->tanggal_baru . " | Waktu: " . $request->waktu_baru . $alasanText;
+
+        // Clean previous pending markers if any
+        $cleanedCatatan = preg_replace('/\[Pengajuan Jadwal Ulang Pelamar(?:\s*#\d+)?\]:.*$/s', '', $wawancara->catatan ?? '');
         $cleanedCatatan = trim($cleanedCatatan);
         $newCatatan = $cleanedCatatan ? $cleanedCatatan . "\n" . $catatanReschedule : $catatanReschedule;
 
@@ -109,7 +134,7 @@ class PelamarController extends Controller
             'catatan'          => $newCatatan
         ]);
 
-        return back()->with('success', 'Permintaan perubahan jadwal wawancara berhasil diajukan ke tim HRD.');
+        return back()->with('success', 'Pengajuan berhasil diajukan!');
     }
 
     /**

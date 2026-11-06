@@ -40,7 +40,7 @@ export default function KandidatDetailLayout({ title, lamaran, children, backUrl
                         <div className="kandidat-info-stack">
                             <InfoCard label="Nama Lengkap" value={pelamar?.nama_lengkap ?? '—'} />
                             <InfoCard label="Alamat Email" value={pelamar?.email ?? '—'} valueClassName="font-mono text-xs" />
-                            <InfoCard label="Nomor HP" value={pelamar?.no_telepon ?? '—'} />
+                            <InfoCard label="Nomor HP" value={pelamar?.nomor_hp ?? pelamar?.no_telepon ?? '—'} />
                         </div>
 
                         {/* Page Specific Content */}

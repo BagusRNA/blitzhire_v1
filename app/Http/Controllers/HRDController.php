@@ -72,7 +72,7 @@ class HRDController extends Controller
 
     public function manajemenData()
     {
-        $pelamar = Lamaran::with(['pelamar', 'dokumen'])
+        $pelamar = Lamaran::with(['pelamar', 'dokumen', 'lowongan'])
             ->orderBy('tanggal_lamaran', 'desc')
             ->get();
 
@@ -83,7 +83,15 @@ class HRDController extends Controller
 
     public function destroyLamaran($id_lamaran)
     {
-        $lamaran = Lamaran::findOrFail($id_lamaran);
+        $lamaran = Lamaran::with('dokumen')->findOrFail($id_lamaran);
+
+        // Hapus file fisik dokumen jika ada
+        foreach ($lamaran->dokumen as $dok) {
+            if ($dok->path_file && \Illuminate\Support\Facades\Storage::disk('local')->exists($dok->path_file)) {
+                \Illuminate\Support\Facades\Storage::disk('local')->delete($dok->path_file);
+            }
+        }
+
         $lamaran->delete();
 
         return back()->with('success', 'Data pelamar berhasil dihapus.');
@@ -108,6 +116,48 @@ class HRDController extends Controller
             'thresholds' => $thresholds,
             'categories' => $categories,
         ]);
+    }
+
+    public function saveKonfigurasiPenilaian(\Illuminate\Http\Request $request)
+    {
+        // 1. Validasi Batas Skor Otomatis
+        $thresholds = $request->input('thresholds', []);
+        foreach ($thresholds as $t) {
+            $val = trim(str_replace('%', '', $t['value'] ?? ''));
+            if ($val === '') {
+                return back()->withErrors(['thresholds' => 'Tidak boleh kosong!']);
+            }
+            if (!is_numeric($val) || $val < 0 || $val > 100) {
+                return back()->withErrors(['thresholds' => 'Nilai tidak valid!']);
+            }
+        }
+
+        // 2. Validasi Kategori & Bobot
+        $categories = $request->input('categories', []);
+        $totalBobot = 0;
+        foreach ($categories as $cat) {
+            $w = trim(str_replace('%', '', $cat['weight'] ?? ''));
+            if ($w === '') {
+                return back()->withErrors(['categories' => 'Tidak boleh kosong!']);
+            }
+            if (!is_numeric($w) || $w < 0 || $w > 100) {
+                return back()->withErrors(['categories' => 'Konfigurasi tidak valid!']);
+            }
+            $totalBobot += (float) $w;
+
+            // Validasi kata kunci duplikat
+            $chips = $cat['chips'] ?? [];
+            $lowerChips = array_map('strtolower', $chips);
+            if (count($lowerChips) !== count(array_unique($lowerChips))) {
+                return back()->withErrors(['categories' => 'Kategori sudah ada!']);
+            }
+        }
+
+        if (round($totalBobot) !== 100.0) {
+            return back()->withErrors(['categories' => 'Konfigurasi tidak valid!']);
+        }
+
+        return back()->with('success', 'Konfigurasi penilaian berhasil disimpan.');
     }
 }
 

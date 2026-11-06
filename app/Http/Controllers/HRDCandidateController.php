@@ -105,8 +105,14 @@ class HRDCandidateController extends Controller
         $lamaran->update(['status_lamaran' => 'Offer']);
 
         // Send Email Notification
-        $lamaran->pelamar->notify(new \App\Notifications\JobOfferNotification($penawaran));
+        try {
+            if ($lamaran->pelamar) {
+                $lamaran->pelamar->notify(new \App\Notifications\JobOfferNotification($penawaran));
+            }
+        } catch (\Throwable $e) {
+            // Silently ignore if mail driver is not sending
+        }
 
-        return back()->with('success', 'Job offer sent successfully.');
+        return redirect()->route('hrd.manajemen-kandidat')->with('success', 'Penawaran berhasil diajukan!');
     }
 }

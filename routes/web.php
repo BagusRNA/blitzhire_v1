@@ -45,6 +45,7 @@ Route::middleware(['auth:hrd'])->prefix('hrd')->name('hrd.')->group(function () 
 
     // Konfigurasi Penilaian
     Route::get('/konfigurasi-penilaian', [HRDController::class, 'konfigurasiPenilaian'])->name('konfigurasi-penilaian');
+    Route::post('/konfigurasi-penilaian', [HRDController::class, 'saveKonfigurasiPenilaian'])->name('konfigurasi-penilaian.store');
 
     // Candidate Management (per-job)
     Route::get('/lowongan/{id_lowongan}/kandidat', [HRDCandidateController::class, 'index'])->name('kandidat.index');
@@ -59,6 +60,7 @@ Route::middleware(['auth:hrd'])->prefix('hrd')->name('hrd.')->group(function () 
     Route::post('/kandidat/{id_lamaran}/lanjut-tanpa-wawancara', [\App\Http\Controllers\LamaranDetailController::class, 'lanjutTanpaWawancara'])->name('kandidat.lanjut_tanpa_wawancara');
     Route::get('/kandidat/{id_lamaran}/jadwal-ulang', [\App\Http\Controllers\LamaranDetailController::class, 'jadwalUlang'])->name('kandidat.jadwal_ulang');
     Route::post('/kandidat/{id_lamaran}/reschedule', [\App\Http\Controllers\LamaranDetailController::class, 'reschedule'])->name('kandidat.reschedule');
+    Route::post('/kandidat/{id_lamaran}/reschedule-reject', [\App\Http\Controllers\LamaranDetailController::class, 'rejectReschedule'])->name('kandidat.reschedule_reject');
     Route::get('/kandidat/{id_lamaran}/status-wawancara', [\App\Http\Controllers\LamaranDetailController::class, 'statusWawancara'])->name('kandidat.status_wawancara');
     Route::get('/kandidat/{id_lamaran}/pengajuan', [\App\Http\Controllers\LamaranDetailController::class, 'pengajuan'])->name('kandidat.pengajuan');
     Route::get('/kandidat/{id_lamaran}/hasil-wawancara', [\App\Http\Controllers\LamaranDetailController::class, 'hasilWawancara'])->name('kandidat.hasil_wawancara');
