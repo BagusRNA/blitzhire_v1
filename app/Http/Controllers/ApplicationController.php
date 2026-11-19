@@ -25,6 +25,18 @@ class ApplicationController extends Controller
 
         $pelamarId = auth('pelamar')->id();
 
+        // Cek jika pelamar sudah pernah melamar lowongan ini dan lamarannya masih aktif / sedang diproses oleh HRD (HRD 10)
+        $existingLamaran = Lamaran::where('id_pelamar', $pelamarId)
+            ->where('id_lowongan', $id_lowongan)
+            ->whereNotIn('status_lamaran', ['Ditolak'])
+            ->first();
+
+        if ($existingLamaran) {
+            return back()->withErrors([
+                'duplicate' => 'Anda sudah melamar ke lowongan ini dan lamaran sedang diproses oleh HRD.'
+            ])->with('error', 'Anda sudah melamar ke lowongan ini dan lamaran sedang diproses oleh HRD.');
+        }
+
         // 1. Create Application (Lamaran)
         $lamaran = Lamaran::create([
             'id_pelamar' => $pelamarId,

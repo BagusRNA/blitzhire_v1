@@ -7,6 +7,7 @@ use App\Models\Penawaran;
 use App\Models\JadwalWawancara;
 use App\Models\DokumenPelamar;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
 class PelamarController extends Controller
@@ -186,5 +187,63 @@ class PelamarController extends Controller
 
         // Return printable official document view
         return view('documents.surat_keputusan', compact('lamaran'));
+    }
+
+    /**
+     * Tampilkan halaman Profile Pelamar (Pelamar 2)
+     */
+    public function profile()
+    {
+        $pelamar = auth('pelamar')->user();
+
+        return Inertia::render('Pelamar/Profile', [
+            'pelamar' => $pelamar,
+        ]);
+    }
+
+    /**
+     * Update data Profile Pelamar
+     */
+    public function updateProfile(Request $request)
+    {
+        $pelamar = auth('pelamar')->user();
+
+        $request->validate([
+            'nama_lengkap' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:pelamar,email,' . $pelamar->id_pelamar . ',id_pelamar',
+            'nomor_hp' => 'required|string|max:20',
+            'pendidikan_terakhir' => 'required|string|max:100',
+            'alamat' => 'required|string',
+        ], [
+            'nama_lengkap.required' => 'Nama lengkap harus diisi.',
+            'email.required' => 'Email harus diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar pada akun lain.',
+            'nomor_hp.required' => 'Nomor HP harus diisi.',
+            'pendidikan_terakhir.required' => 'Pendidikan terakhir harus diisi.',
+            'alamat.required' => 'Alamat harus diisi.',
+        ]);
+
+        $data = [
+            'nama_lengkap' => $request->nama_lengkap,
+            'email' => $request->email,
+            'nomor_hp' => $request->nomor_hp,
+            'pendidikan_terakhir' => $request->pendidikan_terakhir,
+            'alamat' => $request->alamat,
+        ];
+
+        if ($request->filled('kata_sandi')) {
+            $request->validate([
+                'kata_sandi' => 'min:6|confirmed',
+            ], [
+                'kata_sandi.min' => 'Password minimal 6 karakter.',
+                'kata_sandi.confirmed' => 'Konfirmasi password tidak cocok.',
+            ]);
+            $data['kata_sandi'] = Hash::make($request->kata_sandi);
+        }
+
+        $pelamar->update($data);
+
+        return back()->with('success', 'Profil pelamar berhasil diperbarui.');
     }
 }

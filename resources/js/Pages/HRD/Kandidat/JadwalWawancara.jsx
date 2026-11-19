@@ -13,7 +13,11 @@ export default function JadwalWawancara({ lamaran }) {
 
     const submitJadwal = (e) => {
         e.preventDefault();
-        post(route('hrd.kandidat.jadwalkan', lamaran.id_lamaran));
+        post(route('hrd.kandidat.jadwalkan', lamaran.id_lamaran), {
+            onSuccess: () => {
+                alert('Jadwal wawancara telah dibuat.');
+            }
+        });
     };
 
     const lanjutTanpaWawancara = () => {
@@ -31,13 +35,28 @@ export default function JadwalWawancara({ lamaran }) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="form-group">
                             <label className="form-label-base">Tanggal & Waktu Wawancara</label>
-                            <input
-                                type="datetime-local"
-                                className="form-input-base"
-                                value={data.tanggal_wawancara}
-                                onChange={e => setData('tanggal_wawancara', e.target.value)}
-                                required
-                            />
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="datetime-local"
+                                    id="jw_tanggal_wawancara"
+                                    className="form-input-base flex-1"
+                                    value={data.tanggal_wawancara}
+                                    onChange={e => setData('tanggal_wawancara', e.target.value)}
+                                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const el = document.getElementById('jw_tanggal_wawancara');
+                                        if (el) el.blur();
+                                    }}
+                                    className="px-3.5 py-2.5 bg-black text-white text-xs font-bold uppercase tracking-wider rounded hover:bg-gray-800 transition cursor-pointer"
+                                    title="Konfirmasi Pilihan Tanggal & Waktu"
+                                >
+                                    OK
+                                </button>
+                            </div>
                             {errors.tanggal_wawancara && <span className="form-error-base">{errors.tanggal_wawancara}</span>}
                         </div>
 

@@ -1,21 +1,38 @@
-import React, { useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import React, { useState, useEffect } from 'react';
+import { Head, Link, useForm, router, usePage } from '@inertiajs/react';
 import Header from '@/Components/Header';
 import Footer from '@/Components/Footer';
 import PelamarModal from '@/Components/PelamarModal';
 
-export default function JobShow({ job }) {
+export default function JobShow({ job, hasActiveApplication = false }) {
+    const { auth, flash = {} } = usePage().props;
+    const isHRD = Boolean(auth?.user && ('id_hrd' in auth.user || auth.user.role === 'hrd'));
+    const pelamar = auth?.user && 'id_pelamar' in auth.user ? auth.user : null;
     const [isApplying, setIsApplying] = useState(false);
     
     const { data, setData, post, processing, errors, reset } = useForm({
-        nama: '',
-        email: '',
-        nomor_telepon: '',
-        alamat: '',
-        domisili: '',
+        nama: pelamar?.nama_lengkap ?? '',
+        email: pelamar?.email ?? '',
+        nomor_telepon: pelamar?.nomor_hp ?? '',
+        alamat: pelamar?.alamat ?? '',
+        domisili: pelamar?.alamat ?? '',
         jenis_dokumen: 'CV / Resume',
         file_dokumen: null
     });
+
+    // Auto-fill data diri pelamar jika terdaftar (HRD 8)
+    useEffect(() => {
+        if (pelamar) {
+            setData((prev) => ({
+                ...prev,
+                nama: prev.nama || pelamar.nama_lengkap || '',
+                email: prev.email || pelamar.email || '',
+                nomor_telepon: prev.nomor_telepon || pelamar.nomor_hp || '',
+                alamat: prev.alamat || pelamar.alamat || '',
+                domisili: prev.domisili || pelamar.alamat || '',
+            }));
+        }
+    }, [pelamar]);
 
     const submitApplication = (e) => {
         e.preventDefault();
@@ -41,10 +58,10 @@ export default function JobShow({ job }) {
                             if (window.history.length > 1) {
                                 window.history.back();
                             } else {
-                                router.visit('/hrd/kelola-job');
+                                router.visit(isHRD ? '/hrd/kelola-job' : '/jobs');
                             }
                         }}
-                        className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-700 hover:text-black py-1.5 px-3 rounded border border-gray-300 bg-white shadow-xs transition"
+                        className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-black bg-white hover:bg-black hover:text-white py-2 px-4 rounded border-2 border-black shadow-xs transition duration-150 cursor-pointer"
                     >
                         ← Kembali
                     </button>
@@ -60,13 +77,30 @@ export default function JobShow({ job }) {
                                 <span className="badge-status-solid">{job.tipe_pekerjaan}</span>
                             </div>
                         </div>
-                        <button 
-                            id="apply-now-btn"
-                            onClick={() => setIsApplying(true)}
-                            className="btn-primary"
-                        >
-                            Apply Now
-                        </button>
+                        {hasActiveApplication ? (
+                            <div className="flex flex-col items-end">
+                                <button 
+                                    type="button"
+                                    disabled
+                                    className="px-4 py-2.5 rounded bg-gray-200 text-gray-600 text-xs font-bold uppercase tracking-wider cursor-not-allowed border border-gray-300 flex items-center gap-1.5"
+                                    title="Anda sudah mendaftar lowongan ini dan sedang diproses oleh HRD"
+                                >
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    Sudah Dilamar (Sedang Diproses)
+                                </button>
+                                <span className="text-[11px] text-gray-500 mt-1">
+                                    Lamaran Anda sedang dalam peninjauan oleh HRD.
+                                </span>
+                            </div>
+                        ) : (
+                            <button 
+                                id="apply-now-btn"
+                                onClick={() => setIsApplying(true)}
+                                className="btn-primary"
+                            >
+                                Apply Now
+                            </button>
+                        )}
                     </div>
 
                     <div className="job-detail-content">
@@ -100,6 +134,11 @@ export default function JobShow({ job }) {
                 maxWidth="max-w-lg"
             >
                 <form onSubmit={submitApplication} className="job-apply-form">
+                    {(errors.duplicate || flash?.error) && (
+                        <div className="p-3 mb-4 bg-red-50 border border-red-300 text-red-700 text-xs font-semibold rounded">
+                            {errors.duplicate || flash?.error}
+                        </div>
+                    )}
                     <div className="form-group">
                         <label className="form-label-base">Nama</label>
                         <input 

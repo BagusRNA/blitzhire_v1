@@ -10,6 +10,7 @@ export default function Header() {
     const isPelamar = user && user.id_pelamar !== undefined;
     
     const dashboardRoute = isHRD ? "/hrd/dashboard" : "/pelamar/dashboard";
+    const profileRoute = isHRD ? "/hrd/profile" : "/pelamar/profile";
     const logoutRoute = isHRD ? "/hrd-login/logout" : "/kandidat/logout";
     
     return (
@@ -61,7 +62,7 @@ export default function Header() {
                                         <Dropdown.Link href={dashboardRoute}>
                                             Dashboard
                                         </Dropdown.Link>
-                                        <Dropdown.Link href="#">
+                                        <Dropdown.Link href={profileRoute}>
                                             Profile
                                         </Dropdown.Link>
                                         <Dropdown.Link

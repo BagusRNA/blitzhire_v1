@@ -17,7 +17,17 @@ export default function ManajemenData({ pelamar = [], flash }) {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [deleteTargetId, setDeleteTargetId] = useState(null);
 
-    // Filter action (TC54: klik tombol Filter untuk menerapkan filter yang dipilih)
+    // Filter action (TC54 & HRD 11)
+    const handleTipeChange = (val) => {
+        setSelectedTipe(val);
+        setAppliedTipe(val);
+    };
+
+    const handleStatusChange = (val) => {
+        setSelectedStatus(val);
+        setAppliedStatus(val);
+    };
+
     const handleApplyFilter = () => {
         setAppliedTipe(selectedTipe);
         setAppliedStatus(selectedStatus);
@@ -89,9 +99,15 @@ export default function ManajemenData({ pelamar = [], flash }) {
         });
     };
 
-    // Reports (IR12, IR13, IR14 / TC58, TC59, TC60)
+    // Reports with active filter query params (IR12, IR13, IR14 & HRD 11)
     const printLaporan = (type) => {
-        window.open(`/hrd/laporan/${type}?format=print`, "_blank");
+        const params = new URLSearchParams();
+        params.append("format", "print");
+        const t = appliedTipe !== "Semua" ? appliedTipe : selectedTipe;
+        const s = appliedStatus !== "Semua" ? appliedStatus : selectedStatus;
+        if (t !== "Semua") params.append("type", t);
+        if (s !== "Semua") params.append("status", s);
+        window.open(`/hrd/laporan/${type}?${params.toString()}`, "_blank");
     };
 
     return (
@@ -129,12 +145,12 @@ export default function ManajemenData({ pelamar = [], flash }) {
                         </button>
                     </div>
 
-                    {/* Filter controls (TC54 & TC55) */}
+                    {/* Filter controls (TC54, TC55, HRD 11) */}
                     <div className="hrd-data-toolbar-right flex flex-wrap items-center gap-2">
                         <select
                             className="hrd-filter-select"
                             value={selectedTipe}
-                            onChange={(e) => setSelectedTipe(e.target.value)}
+                            onChange={(e) => handleTipeChange(e.target.value)}
                         >
                             <option value="Semua">Semua Tipe Pekerjaan</option>
                             <option value="Full-Time">Full-Time</option>
@@ -144,7 +160,7 @@ export default function ManajemenData({ pelamar = [], flash }) {
                         <select
                             className="hrd-filter-select"
                             value={selectedStatus}
-                            onChange={(e) => setSelectedStatus(e.target.value)}
+                            onChange={(e) => handleStatusChange(e.target.value)}
                         >
                             <option value="Semua">Semua Status</option>
                             <option value="Screening">Screening</option>

@@ -240,6 +240,79 @@ class QATestCasesFase6Test extends TestCase
     }
 
     /**
+     * HRD 10: Pelamar tidak dapat melamar ke lowongan yang sama jika lamaran sedang diproses oleh HRD
+     */
+    public function test_hrd10_cegah_pelamar_melamar_ganda_pada_lowongan_yang_sama()
+    {
+        Storage::fake('local');
+        $pdfFile = UploadedFile::fake()->create('cv_pelamar.pdf', 500, 'application/pdf');
+
+        // $this->pelamarAktif sudah memiliki lamaran aktif pada $this->lowongan (status: 'Wawancara')
+        $response = $this->actingAs($this->pelamarAktif, 'pelamar')
+            ->post("/pelamar/jobs/{$this->lowongan->id_lowongan}/apply", [
+                'file_dokumen' => $pdfFile,
+                'jenis_dokumen' => 'CV / Resume',
+            ]);
+
+        $response->assertSessionHasErrors(['duplicate']);
+        // Jumlah lamaran tetap 1 (tidak bertambah ganda)
+        $this->assertEquals(1, Lamaran::where('id_pelamar', $this->pelamarAktif->id_pelamar)
+            ->where('id_lowongan', $this->lowongan->id_lowongan)->count());
+    }
+
+    /**
+     * HRD 7: Fitur mengembalikan / revert status pelamar yang terlanjur diterima atau ditolak
+     */
+    public function test_hrd7_revert_status_kandidat()
+    {
+        // Ubah lamaran ke Ditolak
+        $this->lamaran->update(['status_lamaran' => 'Ditolak']);
+        $this->assertEquals('Ditolak', $this->lamaran->fresh()->status_lamaran);
+
+        // HRD revert ke Screening
+        $response = $this->actingAs($this->hrd, 'hrd')
+            ->post("/hrd/kandidat/{$this->lamaran->id_lamaran}/revert-status", [
+                'target_status' => 'Screening'
+            ]);
+
+        $response->assertSessionHas('success');
+        $this->assertEquals('Screening', $this->lamaran->fresh()->status_lamaran);
+
+        // Revert ke Wawancara
+        $response2 = $this->actingAs($this->hrd, 'hrd')
+            ->post("/hrd/kandidat/{$this->lamaran->id_lamaran}/revert-status", [
+                'target_status' => 'Wawancara'
+            ]);
+
+        $response2->assertSessionHas('success');
+        $this->assertEquals('Wawancara', $this->lamaran->fresh()->status_lamaran);
+    }
+
+    /**
+     * HRD 6: View dan download dokumen CV kandidat
+     */
+    public function test_hrd6_view_dan_download_dokumen_cv()
+    {
+        $dok = \App\Models\DokumenPelamar::create([
+            'id_lamaran' => $this->lamaran->id_lamaran,
+            'jenis_dokumen' => 'CV / Resume',
+            'file_dokumen' => 'test_cv.pdf',
+            'path_file' => 'dummy/test_cv.pdf',
+            'tanggal_upload' => now(),
+        ]);
+
+        $responseView = $this->actingAs($this->hrd, 'hrd')
+            ->get("/hrd/kandidat/dokumen/{$dok->id_dokumen}/view");
+        $responseView->assertOk();
+        $this->assertStringContainsString('application/pdf', $responseView->headers->get('content-type'));
+
+        $responseDownload = $this->actingAs($this->hrd, 'hrd')
+            ->get("/hrd/kandidat/dokumen/{$dok->id_dokumen}/download");
+        $responseDownload->assertOk();
+        $this->assertStringContainsString('application/pdf', $responseDownload->headers->get('content-type'));
+    }
+
+    /**
      * Verifikasi pelamar dibatasi maksimal 3 kali pengajuan jadwal ulang
      */
     public function test_pelamar_dibatasi_maksimal_3_kali_reschedule()

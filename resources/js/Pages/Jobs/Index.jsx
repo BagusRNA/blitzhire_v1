@@ -56,6 +56,22 @@ export default function JobBoard({ jobs, filterOptions = [], filters = {} }) {
             <Header />
 
             <main className="jobs-main">
+                <div className="mb-4">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            if (window.history.length > 1) {
+                                window.history.back();
+                            } else {
+                                router.visit('/pelamar/dashboard');
+                            }
+                        }}
+                        className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-black bg-white hover:bg-black hover:text-white py-2 px-4 rounded border-2 border-black shadow-xs transition duration-150 cursor-pointer"
+                    >
+                        ← Kembali
+                    </button>
+                </div>
+
                 <div className="jobs-header">
                     <h2 className="jobs-title">
                         Discover Your Next Role

@@ -726,7 +726,7 @@
         @apply border border-gray-300 text-gray-700 text-xs font-medium px-4 py-1.5 rounded hover:bg-gray-100 transition-colors;
     }
     .hrd-filter-chip--active {
-        @apply bg-black border-black text-white hover:bg-gray-800;
+        @apply bg-orange-500 border-orange-500 text-white hover:bg-orange-600 font-semibold shadow-sm;
     }
 
     /* --- KANBAN BOARD (Manajemen Kandidat) --- */

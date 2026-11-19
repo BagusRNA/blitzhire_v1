@@ -14,7 +14,7 @@ class LamaranDetailController extends Controller
 
     private function getLamaran($id_lamaran)
     {
-        return Lamaran::with([
+        $lamaran = Lamaran::with([
             'pelamar.sosialMedia',
             'lowongan',
             'dokumen',
@@ -22,6 +22,19 @@ class LamaranDetailController extends Controller
             'penawaran',
         ])
         ->findOrFail($id_lamaran);
+
+        // Jika dokumen pada lamaran ini kosong, cari dokumen terbaru dari pelamar (HRD 6)
+        if ($lamaran->dokumen->isEmpty() && $lamaran->pelamar) {
+            $fallbackDocs = \App\Models\DokumenPelamar::whereHas('lamaran', function ($q) use ($lamaran) {
+                $q->where('id_pelamar', $lamaran->id_pelamar);
+            })->latest('id_dokumen')->get();
+
+            if ($fallbackDocs->isNotEmpty()) {
+                $lamaran->setRelation('dokumen', $fallbackDocs);
+            }
+        }
+
+        return $lamaran;
     }
 
     // ─── 1. Detail Pelamar ───────────────────────────────────────────────────
@@ -298,5 +311,87 @@ class LamaranDetailController extends Controller
 
         return redirect()->route('hrd.manajemen-kandidat')
             ->with('success', 'Kandidat ditolak.');
+    }
+
+    /**
+     * Kembalikan / Revert status pelamar yang terlanjur diterima/ditolak (HRD 7)
+     */
+    public function revertStatus(Request $request, $id_lamaran)
+    {
+        $lamaran = $this->getLamaran($id_lamaran);
+
+        $targetStatus = $request->input('target_status', 'Screening');
+        if (!in_array($targetStatus, ['Screening', 'Wawancara', 'Penawaran', 'Pending'])) {
+            $targetStatus = 'Screening';
+        }
+
+        $lamaran->update(['status_lamaran' => $targetStatus]);
+
+        return redirect()->back()
+            ->with('success', "Status kandidat berhasil dikembalikan ke {$targetStatus}.");
+    }
+
+    /**
+     * Lihat berkas CV kandidat secara inline di tab browser (HRD 6)
+     */
+    public function viewDokumen($id_dokumen)
+    {
+        $dok = \App\Models\DokumenPelamar::findOrFail($id_dokumen);
+        
+        $candidates = [
+            storage_path('app/public/' . $dok->path_file),
+            storage_path('app/' . $dok->path_file),
+            storage_path('app/private/' . $dok->path_file),
+            public_path('storage/' . $dok->path_file),
+        ];
+
+        foreach ($candidates as $filePath) {
+            if (file_exists($filePath) && is_file($filePath)) {
+                return response()->file($filePath, [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline; filename="' . $dok->file_dokumen . '"',
+                ]);
+            }
+        }
+
+        // Placeholder PDF valid jika file belum diunggah secara fisik pada environment dev/seeder
+        return response(
+            "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Count 1/Kids[3 0 R]>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n178\n%%EOF",
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $dok->file_dokumen . '"',
+            ]
+        );
+    }
+
+    /**
+     * Unduh berkas CV kandidat (HRD 6)
+     */
+    public function downloadDokumen($id_dokumen)
+    {
+        $dok = \App\Models\DokumenPelamar::findOrFail($id_dokumen);
+        
+        $candidates = [
+            storage_path('app/public/' . $dok->path_file),
+            storage_path('app/' . $dok->path_file),
+            storage_path('app/private/' . $dok->path_file),
+            public_path('storage/' . $dok->path_file),
+        ];
+
+        foreach ($candidates as $filePath) {
+            if (file_exists($filePath) && is_file($filePath)) {
+                return response()->download($filePath, $dok->file_dokumen);
+            }
+        }
+
+        return response(
+            "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Count 1/Kids[3 0 R]>>endobj\n3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000052 00000 n \n0000000101 00000 n \ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n178\n%%EOF",
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $dok->file_dokumen . '"',
+            ]
+        );
     }
 }

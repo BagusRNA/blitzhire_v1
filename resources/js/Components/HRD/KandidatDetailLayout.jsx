@@ -1,15 +1,20 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import HRDLayout from '@/Layouts/HRDLayout';
 import InfoCard from '@/Components/InfoCard';
 
 export default function KandidatDetailLayout({ title, lamaran, children, backUrl = '/hrd/manajemen-kandidat' }) {
+    const { flash } = usePage().props;
     const pelamar = lamaran?.pelamar;
     const photoUrl = pelamar?.foto_profil ? `/storage/${pelamar.foto_profil}` : null;
 
     return (
         <HRDLayout title={title}>
             <div className="kandidat-detail-container">
+
+                {flash?.success && (
+                    <div className="hrd-flash-success mb-4">{flash.success}</div>
+                )}
 
                 {/* ── Header ── */}
                 <div className="kandidat-detail-header">

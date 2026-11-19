@@ -77,7 +77,7 @@ class HRDCandidateController extends Controller
         }
 
         return redirect()->route('hrd.kandidat.status_wawancara', $id_lamaran)
-            ->with('success', 'Jadwal wawancara berhasil disimpan.');
+            ->with('success', 'Jadwal wawancara telah dibuat.');
     }
 
     /**

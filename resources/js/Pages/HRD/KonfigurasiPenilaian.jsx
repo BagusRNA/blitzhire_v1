@@ -194,6 +194,18 @@ export default function KonfigurasiPenilaian({
                                             updated[idx].value = e.target.value;
                                             setThresholds(updated);
                                         }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === ' ' || e.code === 'Space') {
+                                                e.preventDefault();
+                                                const updated = [...thresholds];
+                                                let val = (updated[idx].value || '').trim();
+                                                if (val && !val.includes('%') && !isNaN(Number(val))) {
+                                                    val = `${val}%`;
+                                                }
+                                                updated[idx].value = val;
+                                                setThresholds(updated);
+                                            }
+                                        }}
                                         placeholder="0%"
                                         className="hrd-config-value w-24 text-right bg-transparent border-b border-gray-400 focus:outline-none focus:border-black font-semibold"
                                     />
@@ -245,7 +257,8 @@ export default function KonfigurasiPenilaian({
                                                     })
                                                 }
                                                 onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
+                                                    // Simpan otomatis kata kunci saat Enter atau Spasi ditekan (HRD 12)
+                                                    if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') {
                                                         e.preventDefault();
                                                         handleAddChip(idx);
                                                     }
@@ -272,6 +285,18 @@ export default function KonfigurasiPenilaian({
                                             const updated = [...categories];
                                             updated[idx].weight = e.target.value;
                                             setCategories(updated);
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === ' ' || e.code === 'Space') {
+                                                e.preventDefault();
+                                                const updated = [...categories];
+                                                let val = (updated[idx].weight || '').trim();
+                                                if (val && !val.includes('%') && !isNaN(Number(val))) {
+                                                    val = `${val}%`;
+                                                }
+                                                updated[idx].weight = val;
+                                                setCategories(updated);
+                                            }
                                         }}
                                         placeholder="0%"
                                         className="hrd-config-value w-20 text-right bg-transparent border-b border-gray-400 focus:outline-none focus:border-black font-semibold"

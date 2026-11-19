@@ -16,9 +16,13 @@ const FINAL_STATUS_MAP = {
     Ditolak: { label: "REJECTED", cls: "hrd-badge-rejected" },
 };
 
-export default function ManajemenKandidat({ lamaran = [], flash }) {
+export default function ManajemenKandidat({ lamaran = [], confirmedInterviews = [], flash }) {
     const [filterTipe, setFilterTipe] = useState("Semua");
+    const [tahapFilter, setTahapFilter] = useState("Semua");
+    const [showTahapDropdown, setShowTahapDropdown] = useState(false);
     const [scheduleModal, setScheduleModal] = useState(null); // id_lamaran | null
+    const [revertModalItem, setRevertModalItem] = useState(null);
+    const [revertTargetStatus, setRevertTargetStatus] = useState("Screening");
     const [candidateName, setCandidateName] = useState("");
 
     const tipeOptions = ["Semua", "Full-Time", "Magang / PKL"];
@@ -51,7 +55,10 @@ export default function ManajemenKandidat({ lamaran = [], flash }) {
         e.preventDefault();
         post(route("hrd.kandidat.schedule", scheduleModal), {
             preserveScroll: true,
-            onSuccess: () => closeModal(),
+            onSuccess: () => {
+                closeModal();
+                alert('Jadwal wawancara telah dibuat.');
+            },
         });
     };
 
@@ -146,8 +153,25 @@ export default function ManajemenKandidat({ lamaran = [], flash }) {
             );
         }
 
+        if (colKey === "Final") {
+            return (
+                <button
+                    type="button"
+                    onClick={() => setRevertModalItem(item)}
+                    className="hrd-kcard-schedule-btn !border-gray-500 !text-gray-700 hover:!bg-gray-100 cursor-pointer"
+                    title="Ubah atau kembalikan status kandidat"
+                >
+                    ↩ Kembalikan Status
+                </button>
+            );
+        }
+
         return null;
     };
+
+    const displayedColumns = tahapFilter === "Semua"
+        ? STATUS_COLUMNS
+        : STATUS_COLUMNS.filter((col) => col.key === tahapFilter);
 
     return (
         <HRDLayout title="Manajemen Kandidat">
@@ -158,12 +182,76 @@ export default function ManajemenKandidat({ lamaran = [], flash }) {
                     <div className="hrd-flash-success">{flash.success}</div>
                 )}
 
-                {/* ── Filter Bar ── */}
+                {/* ── Notification Banner: Pelamar Menerima Jadwal Wawancara (HRD 9) ── */}
+                {confirmedInterviews && confirmedInterviews.length > 0 && (
+                    <div className="bg-emerald-50 border-l-4 border-emerald-500 p-3 mb-4 rounded-r shadow-xs">
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-emerald-800 font-bold text-xs uppercase tracking-wide flex items-center gap-1.5">
+                                🔔 Pelamar Menerima Jadwal Wawancara ({confirmedInterviews.length})
+                            </span>
+                        </div>
+                        <div className="space-y-1.5">
+                            {confirmedInterviews.map((item) => (
+                                <div key={item.id_lamaran} className="text-xs text-emerald-900 flex items-center justify-between">
+                                    <span>
+                                        <strong>{item.pelamar?.nama_lengkap}</strong> telah mengonfirmasi kehadiran wawancara untuk posisi <em>{item.lowongan?.judul_lowongan || item.lowongan?.posisi}</em>.
+                                    </span>
+                                    <Link
+                                        href={route("hrd.kandidat.status_wawancara", item.id_lamaran)}
+                                        className="text-[11px] font-bold text-emerald-800 underline hover:text-emerald-950 ml-3 whitespace-nowrap"
+                                    >
+                                        Lihat Detail →
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* ── Filter Bar (HRD 4 & HRD 5) ── */}
                 <div className="hrd-filter-bar">
                     <span className="hrd-filter-label">FILTER:</span>
-                    <button className="hrd-filter-dropdown-btn">
-                        Tipe <span>▼</span>
-                    </button>
+                    
+                    {/* Dropdown Filter Tahapan Rekrutmen (HRD 5) */}
+                    <div className="relative">
+                        <button
+                            type="button"
+                            onClick={() => setShowTahapDropdown(!showTahapDropdown)}
+                            className="hrd-filter-dropdown-btn cursor-pointer bg-white"
+                        >
+                            <span>Tahap: {tahapFilter === "Semua" ? "Semua Tahap" : (STATUS_COLUMNS.find(c => c.key === tahapFilter)?.label || tahapFilter)}</span>
+                            <span className="text-[10px]">▼</span>
+                        </button>
+                        {showTahapDropdown && (
+                            <div className="absolute left-0 mt-1 w-48 bg-white border border-gray-300 rounded shadow-lg z-20 py-1 text-xs">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setTahapFilter("Semua");
+                                        setShowTahapDropdown(false);
+                                    }}
+                                    className={`w-full text-left px-3 py-1.5 hover:bg-orange-50 hover:text-orange-600 transition ${tahapFilter === "Semua" ? "font-bold text-orange-600 bg-orange-50" : "text-gray-700"}`}
+                                >
+                                    Semua Tahap
+                                </button>
+                                {STATUS_COLUMNS.map((col) => (
+                                    <button
+                                        key={col.key}
+                                        type="button"
+                                        onClick={() => {
+                                            setTahapFilter(col.key);
+                                            setShowTahapDropdown(false);
+                                        }}
+                                        className={`w-full text-left px-3 py-1.5 hover:bg-orange-50 hover:text-orange-600 transition ${tahapFilter === col.key ? "font-bold text-orange-600 bg-orange-50" : "text-gray-700"}`}
+                                    >
+                                        {col.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Filter Kategori / Tipe Lowongan (HRD 4 Highlight Orange) */}
                     {tipeOptions.map((opt) => (
                         <button
                             key={opt}
@@ -178,7 +266,7 @@ export default function ManajemenKandidat({ lamaran = [], flash }) {
                 {/* ── Kanban Board ── */}
                 <div className="hrd-kanban-wrapper">
                     <div className="hrd-kanban-board">
-                        {STATUS_COLUMNS.map((col) => {
+                        {displayedColumns.map((col) => {
                             const cards = byStatus(col.key);
                             return (
                                 <div key={col.key} className="hrd-kanban-col">
@@ -326,16 +414,30 @@ export default function ManajemenKandidat({ lamaran = [], flash }) {
                         <label className="form-label-base">
                             Date &amp; Time
                         </label>
-                        <input
-                            id="schedule-datetime"
-                            type="datetime-local"
-                            className="form-input-base"
-                            value={data.tanggal_wawancara}
-                            onChange={(e) =>
-                                setData("tanggal_wawancara", e.target.value)
-                            }
-                            required
-                        />
+                        <div className="flex items-center gap-2">
+                            <input
+                                id="schedule-datetime"
+                                type="datetime-local"
+                                className="form-input-base flex-1"
+                                value={data.tanggal_wawancara}
+                                onChange={(e) =>
+                                    setData("tanggal_wawancara", e.target.value)
+                                }
+                                onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                                required
+                            />
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const el = document.getElementById("schedule-datetime");
+                                    if (el) el.blur();
+                                }}
+                                className="px-3.5 py-2.5 bg-black text-white text-xs font-bold uppercase tracking-wider rounded hover:bg-gray-800 transition cursor-pointer"
+                                title="Konfirmasi Pilihan Tanggal & Waktu"
+                            >
+                                OK
+                            </button>
+                        </div>
                         {errors.tanggal_wawancara && (
                             <span className="form-error-base">
                                 {errors.tanggal_wawancara}
@@ -481,6 +583,65 @@ export default function ManajemenKandidat({ lamaran = [], flash }) {
                         </button>
                     </div>
                 </form>
+            </PelamarModal>
+
+            {/* ══ REVERT STATUS MODAL (HRD 7) ══ */}
+            <PelamarModal
+                isOpen={!!revertModalItem}
+                onClose={() => setRevertModalItem(null)}
+                title={
+                    revertModalItem
+                        ? `Kembalikan Status - ${revertModalItem.pelamar?.nama_lengkap ?? "Kandidat"}`
+                        : "Kembalikan Status"
+                }
+                maxWidth="max-w-md"
+            >
+                <div className="space-y-4 pt-2">
+                    <p className="text-xs text-gray-600">
+                        Status kandidat ini saat ini adalah <strong>{revertModalItem?.status_lamaran}</strong>. Pilih tahap proses rekrutmen tujuan untuk mengembalikan status kandidat:
+                    </p>
+
+                    <div>
+                        <label className="form-label-base">Pilih Tahap Rekrutmen</label>
+                        <select
+                            value={revertTargetStatus}
+                            onChange={(e) => setRevertTargetStatus(e.target.value)}
+                            className="form-select-base"
+                        >
+                            <option value="Screening">Tahap Screening</option>
+                            <option value="Wawancara">Tahap Wawancara</option>
+                            <option value="Penawaran">Tahap Penawaran</option>
+                        </select>
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-3 border-t border-gray-200">
+                        <button
+                            type="button"
+                            onClick={() => setRevertModalItem(null)}
+                            className="btn-secondary"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (revertModalItem) {
+                                    router.post(
+                                        route("hrd.kandidat.revert_status", revertModalItem.id_lamaran),
+                                        { target_status: revertTargetStatus },
+                                        {
+                                            preserveScroll: true,
+                                            onSuccess: () => setRevertModalItem(null),
+                                        }
+                                    );
+                                }
+                            }}
+                            className="btn-primary"
+                        >
+                            Konfirmasi Kembalikan
+                        </button>
+                    </div>
+                </div>
             </PelamarModal>
         </HRDLayout>
     );

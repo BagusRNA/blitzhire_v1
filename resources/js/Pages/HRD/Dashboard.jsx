@@ -83,7 +83,7 @@ export default function HRDDashboard({ stats, recentApplications }) {
                                         </td>
                                         <td className="hrd-table-td">
                                             <Link
-                                                href={`/hrd/manajemen-kandidat`}
+                                                href={`/hrd/kandidat/${app.id_lamaran}/detail`}
                                                 className="hrd-open-details-link"
                                             >
                                                 Open Details →

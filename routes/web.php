@@ -68,6 +68,13 @@ Route::middleware(['auth:hrd'])->prefix('hrd')->name('hrd.')->group(function () 
     Route::get('/kandidat/{id_lamaran}/penawaran', [\App\Http\Controllers\LamaranDetailController::class, 'penawaran'])->name('kandidat.penawaran');
     Route::post('/kandidat/{id_lamaran}/terima', [\App\Http\Controllers\LamaranDetailController::class, 'terima'])->name('kandidat.terima');
     Route::post('/kandidat/{id_lamaran}/tolak', [\App\Http\Controllers\LamaranDetailController::class, 'tolak'])->name('kandidat.tolak');
+    Route::post('/kandidat/{id_lamaran}/revert-status', [\App\Http\Controllers\LamaranDetailController::class, 'revertStatus'])->name('kandidat.revert_status');
+    Route::get('/kandidat/dokumen/{id_dokumen}/view', [\App\Http\Controllers\LamaranDetailController::class, 'viewDokumen'])->name('kandidat.dokumen.view');
+    Route::get('/kandidat/dokumen/{id_dokumen}/download', [\App\Http\Controllers\LamaranDetailController::class, 'downloadDokumen'])->name('kandidat.dokumen.download');
+
+    // Profile
+    Route::get('/profile', [HRDController::class, 'profile'])->name('profile');
+    Route::patch('/profile', [HRDController::class, 'updateProfile'])->name('profile.update');
 
     // Reports
     Route::get('/laporan/pelamar', [\App\Http\Controllers\ReportController::class, 'laporanPelamar'])->name('laporan.pelamar');
@@ -78,6 +85,8 @@ Route::middleware(['auth:hrd'])->prefix('hrd')->name('hrd.')->group(function () 
 // Pelamar Protected Routes
 Route::middleware(['auth:pelamar'])->prefix('pelamar')->name('pelamar.')->group(function () {
     Route::get('/dashboard', [PelamarController::class, 'dashboard'])->name('dashboard');
+    Route::get('/profile', [PelamarController::class, 'profile'])->name('profile');
+    Route::patch('/profile', [PelamarController::class, 'updateProfile'])->name('profile.update');
     Route::post('/jobs/{id_lowongan}/apply', [ApplicationController::class, 'store'])->name('jobs.apply');
     
     // Offer Actions

@@ -881,31 +881,61 @@ export default function Dashboard({ lamarans, lamaran }) {
                                                         )}
 
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                            <div className="border border-gray-800 rounded-lg p-3 sm:p-4 bg-white">
-                                                                <label className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">
-                                                                    TANGGAL BARU
-                                                                </label>
-                                                                <input
-                                                                    type="date"
-                                                                    value={rescheduleForm.tanggal_baru}
-                                                                    onChange={(e) => setRescheduleForm({ ...rescheduleForm, tanggal_baru: e.target.value })}
-                                                                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
-                                                                    className="w-full text-sm font-bold text-black border-none p-0 focus:ring-0 focus:outline-none bg-transparent cursor-pointer"
-                                                                    required
-                                                                />
+                                                            <div className="border border-gray-800 rounded-lg p-3 sm:p-4 bg-white flex items-center justify-between">
+                                                                <div className="flex-1">
+                                                                    <label className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">
+                                                                        TANGGAL BARU
+                                                                    </label>
+                                                                    <input
+                                                                        type="date"
+                                                                        id="reschedule_tanggal_baru"
+                                                                        value={rescheduleForm.tanggal_baru}
+                                                                        onChange={(e) => setRescheduleForm({ ...rescheduleForm, tanggal_baru: e.target.value })}
+                                                                        onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                                                                        className="w-full text-sm font-bold text-black border-none p-0 focus:ring-0 focus:outline-none bg-transparent cursor-pointer"
+                                                                        required
+                                                                    />
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        const el = document.getElementById('reschedule_tanggal_baru');
+                                                                        if (el) el.blur();
+                                                                    }}
+                                                                    className="px-2.5 py-1 bg-black text-white text-xs font-bold rounded hover:bg-gray-800 transition active:scale-95 ml-2 cursor-pointer"
+                                                                    title="Konfirmasi Tanggal"
+                                                                >
+                                                                    OK
+                                                                </button>
                                                             </div>
-                                                            <div className="border border-gray-800 rounded-lg p-3 sm:p-4 bg-white">
-                                                                <label className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">
-                                                                    WAKTU
-                                                                </label>
-                                                                <input
-                                                                    type="time"
-                                                                    value={rescheduleForm.waktu_baru}
-                                                                    onChange={(e) => setRescheduleForm({ ...rescheduleForm, waktu_baru: e.target.value })}
-                                                                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
-                                                                    className="w-full text-sm font-bold text-black border-none p-0 focus:ring-0 focus:outline-none bg-transparent cursor-pointer"
-                                                                    required
-                                                                />
+                                                            <div className="border border-gray-800 rounded-lg p-3 sm:p-4 bg-white flex items-center justify-between">
+                                                                <div className="flex-1">
+                                                                    <label className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">
+                                                                        WAKTU
+                                                                    </label>
+                                                                    <input
+                                                                        type="time"
+                                                                        id="reschedule_waktu_baru"
+                                                                        value={rescheduleForm.waktu_baru}
+                                                                        onChange={(e) => setRescheduleForm({ ...rescheduleForm, waktu_baru: e.target.value })}
+                                                                        onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                                                                        className="w-full text-sm font-bold text-black border-none p-0 focus:ring-0 focus:outline-none bg-transparent cursor-pointer"
+                                                                        required
+                                                                    />
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        const el = document.getElementById('reschedule_waktu_baru');
+                                                                        if (el) el.blur();
+                                                                    }}
+                                                                    className="px-2.5 py-1 bg-black text-white text-xs font-bold rounded hover:bg-gray-800 transition active:scale-95 ml-2 cursor-pointer"
+                                                                    title="Konfirmasi Waktu"
+                                                                >
+                                                                    OK
+                                                                </button>
                                                             </div>
                                                         </div>
 

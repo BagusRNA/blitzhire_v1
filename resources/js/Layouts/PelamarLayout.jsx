@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import Dropdown from '@/Components/Dropdown';
 import PelamarModal from '@/Components/PelamarModal';
 import InfoCard from '@/Components/InfoCard';
 
@@ -16,7 +17,8 @@ export default function PelamarLayout({ title, children }) {
     };
 
     const sidebarItems = [
-        { label: 'Dashboard', href: '/pelamar/dashboard', active: true },
+        { label: 'Dashboard', href: '/pelamar/dashboard', active: url.startsWith('/pelamar/dashboard') },
+        { label: 'Profile', href: '/pelamar/profile', active: url.startsWith('/pelamar/profile') },
     ];
 
     return (
@@ -53,12 +55,40 @@ export default function PelamarLayout({ title, children }) {
                         Explore Jobs
                     </Link>
 
-                    {/* Pelamar Badge */}
-                    <div className="portal-user-badge">
-                        <div className="portal-user-badge-icon"></div>
-                        <span className="font-semibold text-xs text-gray-900 tracking-wide">
-                            {user?.nama_lengkap ? user.nama_lengkap.split(' ')[0] : 'Pelamar'}
-                        </span>
+                    {/* Pelamar Dropdown */}
+                    <div className="relative">
+                        <Dropdown>
+                            <Dropdown.Trigger>
+                                <button
+                                    type="button"
+                                    className="portal-user-badge flex items-center gap-2 cursor-pointer focus:outline-none"
+                                >
+                                    <div className="portal-user-badge-icon"></div>
+                                    <span className="font-semibold text-xs text-gray-900 tracking-wide">
+                                        {user?.nama_lengkap ? user.nama_lengkap.split(' ')[0] : 'Pelamar'}
+                                    </span>
+                                    <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                            </Dropdown.Trigger>
+
+                            <Dropdown.Content align="right" width="48">
+                                <Dropdown.Link href="/pelamar/dashboard">
+                                    Dashboard
+                                </Dropdown.Link>
+                                <Dropdown.Link href="/pelamar/profile">
+                                    Profile
+                                </Dropdown.Link>
+                                <Dropdown.Link
+                                    href="/kandidat/logout"
+                                    method="post"
+                                    as="button"
+                                >
+                                    Log Out
+                                </Dropdown.Link>
+                            </Dropdown.Content>
+                        </Dropdown>
                     </div>
                 </nav>
             </header>

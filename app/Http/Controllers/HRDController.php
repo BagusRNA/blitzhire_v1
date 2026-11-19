@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Lamaran;
 use App\Models\Lowongan;
 use App\Models\JadwalWawancara;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Carbon\Carbon;
 
@@ -65,8 +67,18 @@ class HRDController extends Controller
             ->orderBy('tanggal_lamaran', 'desc')
             ->get();
 
+        // Cari lamaran yang pelamarnya telah mengonfirmasi/menerima jadwal wawancara (HRD 9)
+        $confirmedInterviews = $lamaran->filter(function ($item) {
+            $latest = $item->wawancara->last();
+            return $latest && (
+                $latest->status_wawancara === 'Terkonfirmasi' ||
+                str_contains($latest->catatan ?? '', '[Pelamar]: Telah mengonfirmasi')
+            );
+        })->values();
+
         return Inertia::render('HRD/ManajemenKandidat', [
             'lamaran' => $lamaran,
+            'confirmedInterviews' => $confirmedInterviews,
         ]);
     }
 
@@ -158,6 +170,55 @@ class HRDController extends Controller
         }
 
         return back()->with('success', 'Konfigurasi penilaian berhasil disimpan.');
+    }
+
+    /**
+     * Tampilkan halaman Profile Admin / HRD (HRD 13)
+     */
+    public function profile()
+    {
+        $hrd = auth('hrd')->user();
+
+        return Inertia::render('HRD/Profile', [
+            'hrd' => $hrd,
+        ]);
+    }
+
+    /**
+     * Update data Profile Admin / HRD
+     */
+    public function updateProfile(Request $request)
+    {
+        $hrd = auth('hrd')->user();
+
+        $request->validate([
+            'nama_pengguna' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:hrd,email,' . $hrd->id_hrd . ',id_hrd',
+        ], [
+            'nama_pengguna.required' => 'Nama pengguna harus diisi.',
+            'email.required' => 'Email harus diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan oleh akun lain.',
+        ]);
+
+        $data = [
+            'nama_pengguna' => $request->nama_pengguna,
+            'email' => $request->email,
+        ];
+
+        if ($request->filled('kata_sandi')) {
+            $request->validate([
+                'kata_sandi' => 'min:6|confirmed',
+            ], [
+                'kata_sandi.min' => 'Password minimal 6 karakter.',
+                'kata_sandi.confirmed' => 'Konfirmasi password tidak cocok.',
+            ]);
+            $data['kata_sandi'] = Hash::make($request->kata_sandi);
+        }
+
+        $hrd->update($data);
+
+        return back()->with('success', 'Profil Admin/HRD berhasil diperbarui.');
     }
 }
 

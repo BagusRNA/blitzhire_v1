@@ -59,8 +59,18 @@ class JobController extends Controller
     {
         $job = Lowongan::findOrFail($id_lowongan);
 
+        $pelamarId = auth('pelamar')->id();
+        $hasActiveApplication = false;
+        if ($pelamarId) {
+            $hasActiveApplication = \App\Models\Lamaran::where('id_pelamar', $pelamarId)
+                ->where('id_lowongan', $id_lowongan)
+                ->whereNotIn('status_lamaran', ['Ditolak'])
+                ->exists();
+        }
+
         return Inertia::render('Jobs/Show', [
-            'job' => $job
+            'job' => $job,
+            'hasActiveApplication' => $hasActiveApplication,
         ]);
     }
 

@@ -194,5 +194,32 @@ class QATestCasesFase4Test extends TestCase
             ->where('laporan.0.pelamar.nama_lengkap', 'Pelamar Dua')
         );
     }
+
+    /**
+     * HRD 11: Cetak Laporan dengan filtering tipe dan status berjalan akurat
+     */
+    public function test_hrd11_cetak_laporan_dengan_filter_tipe_dan_status()
+    {
+        // Filter Laporan Pelamar dengan status 'Diterima' dan tipe 'Magang / PKL' -> Pelamar Dua
+        $response = $this->actingAs($this->hrd, 'hrd')
+            ->get('/hrd/laporan/pelamar?status=Diterima&type=Magang / PKL');
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('HRD/Laporan/Pelamar')
+            ->has('laporan', 1)
+            ->where('laporan.0.pelamar.nama_lengkap', 'Pelamar Dua')
+        );
+
+        // Filter status 'Wawancara' (tidak ada di setup) -> 0 data
+        $responseEmpty = $this->actingAs($this->hrd, 'hrd')
+            ->get('/hrd/laporan/pelamar?status=Wawancara');
+
+        $responseEmpty->assertStatus(200);
+        $responseEmpty->assertInertia(fn (Assert $page) => $page
+            ->component('HRD/Laporan/Pelamar')
+            ->has('laporan', 0)
+        );
+    }
 }
 

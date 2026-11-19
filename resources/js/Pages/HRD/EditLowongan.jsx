@@ -334,16 +334,36 @@ export default function EditLowongan({ lowongan = null, isEdit = false }) {
                                 </label>
                                 <div className="hrd-range-inputs">
                                     <input
-                                        type="number"
+                                        type="text"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
                                         value={data.gaji_min}
-                                        onChange={(e) => setData('gaji_min', e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key) && !e.ctrlKey && !e.metaKey) {
+                                                e.preventDefault();
+                                            }
+                                        }}
+                                        onChange={(e) => {
+                                            const val = e.target.value.replace(/[^0-9]/g, '');
+                                            setData('gaji_min', val);
+                                        }}
                                         placeholder="Min xxxxxxx"
                                         className="hrd-input-control"
                                     />
                                     <input
-                                        type="number"
+                                        type="text"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
                                         value={data.gaji_max}
-                                        onChange={(e) => setData('gaji_max', e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key) && !e.ctrlKey && !e.metaKey) {
+                                                e.preventDefault();
+                                            }
+                                        }}
+                                        onChange={(e) => {
+                                            const val = e.target.value.replace(/[^0-9]/g, '');
+                                            setData('gaji_max', val);
+                                        }}
                                         placeholder="Max xxxxxxx"
                                         className="hrd-input-control"
                                     />
@@ -423,30 +443,55 @@ export default function EditLowongan({ lowongan = null, isEdit = false }) {
                 )}
 
                 {/* ══════════════════════════════════════════════
-                    STEP 2: DESKRIPSI LOWONGAN (IMAGE 2)
+                    STEP 2: DESKRIPSI & KUALIFIKASI (IMAGE 2)
                    ══════════════════════════════════════════════ */}
                 {currentStep === 2 && (
                     <div className="hrd-wizard-card">
                         <div className="hrd-wizard-section-head">
                             <h2 className="hrd-wizard-section-title">
-                                DESKRIPSI LOWONGAN
+                                DESKRIPSI & KUALIFIKASI LOWONGAN
                             </h2>
                             <div className="hrd-wizard-section-line"></div>
                         </div>
 
-                        <div className="flex flex-col gap-3">
-                            <textarea
-                                rows={12}
-                                value={data.deskripsi}
-                                onChange={(e) => setData('deskripsi', e.target.value)}
-                                placeholder="Tuliskan deskripsi lengkap dan persyaratan kualifikasi pekerjaan..."
-                                className="hrd-textarea-large"
-                            ></textarea>
-                            {(step2Errors.deskripsi || errors.deskripsi) && (
-                                <span className="form-error">
-                                    {step2Errors.deskripsi || errors.deskripsi}
-                                </span>
-                            )}
+                        <div className="flex flex-col gap-6">
+                            {/* Deskripsi Pekerjaan */}
+                            <div className="flex flex-col gap-2">
+                                <label className="hrd-input-label font-bold text-gray-800">
+                                    Deskripsi Pekerjaan <span className="text-red-500">*</span>
+                                </label>
+                                <textarea
+                                    rows={7}
+                                    value={data.deskripsi}
+                                    onChange={(e) => setData('deskripsi', e.target.value)}
+                                    placeholder="Tuliskan deskripsi lengkap pekerjaan, tanggung jawab, dan peran..."
+                                    className="hrd-textarea-large"
+                                ></textarea>
+                                {(step2Errors.deskripsi || errors.deskripsi) && (
+                                    <span className="form-error">
+                                        {step2Errors.deskripsi || errors.deskripsi}
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Kualifikasi Pekerjaan */}
+                            <div className="flex flex-col gap-2">
+                                <label className="hrd-input-label font-bold text-gray-800">
+                                    Kualifikasi / Persyaratan
+                                </label>
+                                <textarea
+                                    rows={7}
+                                    value={data.kualifikasi}
+                                    onChange={(e) => setData('kualifikasi', e.target.value)}
+                                    placeholder="Tuliskan kualifikasi, keahlian khusus, pengalaman, atau latar belakang pendidikan yang dibutuhkan..."
+                                    className="hrd-textarea-large"
+                                ></textarea>
+                                {errors.kualifikasi && (
+                                    <span className="form-error">
+                                        {errors.kualifikasi}
+                                    </span>
+                                )}
+                            </div>
                         </div>
 
                         {/* Navigation Footer Step 2 */}
@@ -503,9 +548,21 @@ export default function EditLowongan({ lowongan = null, isEdit = false }) {
                             </div>
 
                             <div className="hrd-preview-body-content">
-                                {data.deskripsi ||
-                                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'}
+                                <h4 className="font-bold text-xs uppercase tracking-wider text-gray-500 mb-1">Deskripsi:</h4>
+                                <div className="whitespace-pre-line text-sm text-gray-800">
+                                    {data.deskripsi ||
+                                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'}
+                                </div>
                             </div>
+
+                            {data.kualifikasi && (
+                                <div className="hrd-preview-body-content mt-4 pt-4 border-t border-gray-200">
+                                    <h4 className="font-bold text-xs uppercase tracking-wider text-gray-500 mb-1">Kualifikasi:</h4>
+                                    <div className="whitespace-pre-line text-sm text-gray-800">
+                                        {data.kualifikasi}
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Bottom Chips: [RESUME WAJIB] [IDR [MIN] - [MAX]] [BATAS: [DATETIME]] */}
                             <div className="hrd-preview-badge-row">

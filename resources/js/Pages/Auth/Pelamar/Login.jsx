@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function PelamarLogin({ status }) {
+    const [showSuccessModal, setShowSuccessModal] = useState(Boolean(status));
     const { data, setData, post, processing, errors } = useForm({
         email: '',
         kata_sandi: '',
@@ -91,6 +92,30 @@ export default function PelamarLogin({ status }) {
                     </Link>
                 </p>
             </div>
+
+            {/* Modal Pop-up Registrasi Berhasil (Pelamar 1) */}
+            {showSuccessModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-in fade-in duration-200">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center transform transition-all border border-gray-100">
+                        <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-2">Akun anda berhasil dibuat!</h3>
+                        <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+                            {status || 'Akun Anda telah terdaftar. Silakan masuk menggunakan email dan kata sandi Anda.'}
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => setShowSuccessModal(false)}
+                            className="w-full py-2.5 px-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition shadow-md hover:shadow-lg focus:outline-none"
+                        >
+                            OK
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

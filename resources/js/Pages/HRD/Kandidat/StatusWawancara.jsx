@@ -82,6 +82,15 @@ export default function StatusWawancara({ lamaran, jadwalTerakhir, pengajuanPela
                             ? (jadwalTerakhir?.link_meeting || '—') 
                             : (jadwalTerakhir?.lokasi || '—')}
                     />
+
+                    <div className="flex justify-end pt-1">
+                        <a
+                            href={route('hrd.kandidat.detail', lamaran.id_lamaran)}
+                            className="text-xs font-bold text-gray-700 hover:text-black underline flex items-center gap-1"
+                        >
+                            📄 Lihat Profil Lengkap & Berkas CV Kandidat →
+                        </a>
+                    </div>
                 </div>
 
                 {/* Actions */}

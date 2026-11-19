@@ -1,5 +1,6 @@
 import React from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import Dropdown from '@/Components/Dropdown';
 
 export default function HRDLayout({ title, children }) {
     const { url, props } = usePage();
@@ -16,6 +17,7 @@ export default function HRDLayout({ title, children }) {
         { label: 'Manajemen Data',        href: '/hrd/manajemen-data',         match: '/hrd/manajemen-data' },
         { label: 'Kelola Job',            href: '/hrd/kelola-job',             match: '/hrd/kelola-job' },
         { label: 'Konfigurasi Penilaian', href: '/hrd/konfigurasi-penilaian',  match: '/hrd/konfigurasi-penilaian' },
+        { label: 'Profile',               href: '/hrd/profile',               match: '/hrd/profile' },
     ];
 
     return (
@@ -92,9 +94,37 @@ export default function HRDLayout({ title, children }) {
                         >
                             Explore Jobs
                         </Link>
-                        <div className="hrd-topbar-user">
-                            <div className="hrd-topbar-user-icon"></div>
-                            <span>Admin/HRD</span>
+                        <div className="relative">
+                            <Dropdown>
+                                <Dropdown.Trigger>
+                                    <button
+                                        type="button"
+                                        className="hrd-topbar-user flex items-center gap-2 cursor-pointer focus:outline-none"
+                                    >
+                                        <div className="hrd-topbar-user-icon"></div>
+                                        <span>Admin/HRD</span>
+                                        <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                </Dropdown.Trigger>
+
+                                <Dropdown.Content align="right" width="48">
+                                    <Dropdown.Link href="/hrd/dashboard">
+                                        Dashboard
+                                    </Dropdown.Link>
+                                    <Dropdown.Link href="/hrd/profile">
+                                        Profile
+                                    </Dropdown.Link>
+                                    <Dropdown.Link
+                                        href="/hrd-login/logout"
+                                        method="post"
+                                        as="button"
+                                    >
+                                        Log Out
+                                    </Dropdown.Link>
+                                </Dropdown.Content>
+                            </Dropdown>
                         </div>
                     </nav>
                 </header>
