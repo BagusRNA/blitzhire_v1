@@ -366,6 +366,51 @@ class LamaranDetailController extends Controller
     }
 
     /**
+     * Upload Surat Keputusan (SK) Penerimaan oleh HRD (HRD 22)
+     */
+    public function uploadSuratKeputusan(Request $request, $id_lamaran)
+    {
+        $request->validate([
+            'file_sk' => 'required|file|mimes:pdf|max:5120',
+        ], [
+            'file_sk.required' => 'File Surat Keputusan wajib diunggah.',
+            'file_sk.mimes'    => 'Format file Surat Keputusan harus berformat PDF.',
+            'file_sk.max'      => 'Ukuran file Surat Keputusan maksimal 5MB.',
+        ]);
+
+        $lamaran = $this->getLamaran($id_lamaran);
+        $file = $request->file('file_sk');
+        $fileName = 'SK_' . $lamaran->id_lamaran . '_' . time() . '.pdf';
+        $path = $file->storeAs('pelamar/dokumen', $fileName, 'local');
+
+        // Cari apakah SK sudah pernah diunggah sebelumnya
+        $existingSk = \App\Models\DokumenPelamar::where('id_lamaran', $lamaran->id_lamaran)
+            ->where(function($q) {
+                $q->where('jenis_dokumen', 'Surat Keputusan')
+                  ->orWhere('jenis_dokumen', 'SK');
+            })->first();
+
+        if ($existingSk) {
+            $existingSk->update([
+                'file_dokumen'   => $fileName,
+                'path_file'      => $path,
+                'tanggal_upload' => now(),
+            ]);
+        } else {
+            \App\Models\DokumenPelamar::create([
+                'id_lamaran'     => $lamaran->id_lamaran,
+                'jenis_dokumen'  => 'Surat Keputusan',
+                'file_dokumen'   => $fileName,
+                'path_file'      => $path,
+                'tanggal_upload' => now(),
+            ]);
+        }
+
+        return redirect()->back()
+            ->with('success', 'Surat Keputusan berhasil diunggah. Pelamar kini dapat mengunduh dokumen SK ini di portal pelamar.');
+    }
+
+    /**
      * Unduh berkas CV kandidat (HRD 6)
      */
     public function downloadDokumen($id_dokumen)

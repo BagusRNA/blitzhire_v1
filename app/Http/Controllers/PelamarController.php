@@ -38,14 +38,10 @@ class PelamarController extends Controller
     {
         $penawaran = Penawaran::findOrFail($id_penawaran);
         
-        // Update Offer Status
+        // Pelamar 10: Update status penawaran saja, tidak mengubah status pelamar otomatis ke Diterima
         $penawaran->update(['status_penawaran' => 'Diterima']);
 
-        // Update overall Application Status
-        $lamaran = Lamaran::findOrFail($penawaran->id_lamaran);
-        $lamaran->update(['status_lamaran' => 'Diterima']);
-
-        return back()->with('success', 'Penawaran diterima!');
+        return back()->with('success', 'Penawaran diterima! Menunggu keputusan akhir dan penerbitan Surat Keputusan oleh HRD.');
     }
 
     /**
@@ -181,8 +177,21 @@ class PelamarController extends Controller
             return str_contains($jenis, 'keputusan') || str_contains($jenis, 'sk') || str_contains($jenis, 'surat');
         });
 
-        if ($skDoc && \Illuminate\Support\Facades\Storage::disk('local')->exists($skDoc->path_file)) {
-            return \Illuminate\Support\Facades\Storage::disk('local')->download($skDoc->path_file, $skDoc->file_dokumen);
+        if ($skDoc) {
+            $candidates = [
+                storage_path('app/' . $skDoc->path_file),
+                storage_path('app/public/' . $skDoc->path_file),
+                storage_path('app/private/' . $skDoc->path_file),
+                public_path('storage/' . $skDoc->path_file),
+            ];
+
+            foreach ($candidates as $filePath) {
+                if (file_exists($filePath) && is_file($filePath)) {
+                    return response()->download($filePath, $skDoc->file_dokumen ?: 'Surat_Keputusan_Penerimaan.pdf', [
+                        'Content-Type' => 'application/pdf',
+                    ]);
+                }
+            }
         }
 
         // Return printable official document view

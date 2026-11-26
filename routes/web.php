@@ -69,6 +69,7 @@ Route::middleware(['auth:hrd'])->prefix('hrd')->name('hrd.')->group(function () 
     Route::post('/kandidat/{id_lamaran}/terima', [\App\Http\Controllers\LamaranDetailController::class, 'terima'])->name('kandidat.terima');
     Route::post('/kandidat/{id_lamaran}/tolak', [\App\Http\Controllers\LamaranDetailController::class, 'tolak'])->name('kandidat.tolak');
     Route::post('/kandidat/{id_lamaran}/revert-status', [\App\Http\Controllers\LamaranDetailController::class, 'revertStatus'])->name('kandidat.revert_status');
+    Route::post('/kandidat/{id_lamaran}/surat-keputusan', [\App\Http\Controllers\LamaranDetailController::class, 'uploadSuratKeputusan'])->name('kandidat.upload_sk');
     Route::get('/kandidat/dokumen/{id_dokumen}/view', [\App\Http\Controllers\LamaranDetailController::class, 'viewDokumen'])->name('kandidat.dokumen.view');
     Route::get('/kandidat/dokumen/{id_dokumen}/download', [\App\Http\Controllers\LamaranDetailController::class, 'downloadDokumen'])->name('kandidat.dokumen.download');
 

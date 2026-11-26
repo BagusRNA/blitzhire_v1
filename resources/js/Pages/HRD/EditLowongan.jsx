@@ -436,7 +436,7 @@ export default function EditLowongan({ lowongan = null, isEdit = false }) {
                                 onClick={handleNextToStep2}
                                 className="hrd-wizard-forward-btn"
                             >
-                                LANJUT KE DESKRIPSI →
+                                LANJUT KE DESKRIPSI & KUALIFIKASI →
                             </button>
                         </div>
                     </div>

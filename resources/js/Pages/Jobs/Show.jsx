@@ -20,19 +20,35 @@ export default function JobShow({ job, hasActiveApplication = false }) {
         file_dokumen: null
     });
 
-    // Auto-fill data diri pelamar jika terdaftar (HRD 8)
+    // Auto-fill data diri pelamar jika terdaftar (HRD 8 & Pelamar 7)
     useEffect(() => {
         if (pelamar) {
             setData((prev) => ({
                 ...prev,
-                nama: prev.nama || pelamar.nama_lengkap || '',
-                email: prev.email || pelamar.email || '',
-                nomor_telepon: prev.nomor_telepon || pelamar.nomor_hp || '',
-                alamat: prev.alamat || pelamar.alamat || '',
-                domisili: prev.domisili || pelamar.alamat || '',
+                nama: pelamar.nama_lengkap || prev.nama || '',
+                email: pelamar.email || prev.email || '',
+                nomor_telepon: pelamar.nomor_hp || prev.nomor_telepon || '',
+                alamat: pelamar.alamat || prev.alamat || '',
+                domisili: pelamar.alamat || prev.domisili || '',
             }));
         }
     }, [pelamar]);
+
+    const handleOpenApply = () => {
+        if (!pelamar) {
+            router.visit('/login');
+            return;
+        }
+        setData((prev) => ({
+            ...prev,
+            nama: pelamar.nama_lengkap || '',
+            email: pelamar.email || '',
+            nomor_telepon: pelamar.nomor_hp || '',
+            alamat: pelamar.alamat || '',
+            domisili: pelamar.alamat || '',
+        }));
+        setIsApplying(true);
+    };
 
     const submitApplication = (e) => {
         e.preventDefault();
@@ -95,8 +111,8 @@ export default function JobShow({ job, hasActiveApplication = false }) {
                         ) : (
                             <button 
                                 id="apply-now-btn"
-                                onClick={() => setIsApplying(true)}
-                                className="btn-primary"
+                                onClick={handleOpenApply}
+                                className="btn-primary cursor-pointer"
                             >
                                 Apply Now
                             </button>
@@ -163,9 +179,20 @@ export default function JobShow({ job, hasActiveApplication = false }) {
                         <label className="form-label-base">Nomor Telepon</label>
                         <input 
                             type="text" 
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            placeholder="08xxxxxxxxxx"
                             className="form-input-base" 
                             value={data.nomor_telepon} 
-                            onChange={e => setData('nomor_telepon', e.target.value)} 
+                            onKeyDown={(e) => {
+                                if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key) && !e.ctrlKey && !e.metaKey) {
+                                    e.preventDefault();
+                                }
+                            }}
+                            onChange={e => {
+                                const val = e.target.value.replace(/[^0-9]/g, '');
+                                setData('nomor_telepon', val);
+                            }} 
                         />
                         {errors.nomor_telepon && <p className="form-error-base">{errors.nomor_telepon}</p>}
                     </div>

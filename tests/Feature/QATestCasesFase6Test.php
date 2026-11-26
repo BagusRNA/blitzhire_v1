@@ -144,7 +144,7 @@ class QATestCasesFase6Test extends TestCase
     }
 
     /**
-     * IR23 / TC34: Pelamar menerima penawaran kerja
+     * IR23 / TC34 / Pelamar 10: Pelamar menerima penawaran kerja (status penawaran Diterima, status pelamar tidak otomatis berubah ke Diterima)
      */
     public function test_tc34_pelamar_terima_penawaran_kerja()
     {
@@ -152,12 +152,13 @@ class QATestCasesFase6Test extends TestCase
             ->post("/pelamar/offers/{$this->penawaran->id_penawaran}/accept");
 
         $response->assertRedirect();
-        $response->assertSessionHas('success', 'Penawaran diterima!');
+        $response->assertSessionHas('success');
 
         $this->penawaran->refresh();
         $this->lamaran->refresh();
         $this->assertEquals('Diterima', $this->penawaran->status_penawaran);
-        $this->assertEquals('Diterima', $this->lamaran->status_lamaran);
+        // Status lamaran tidak otomatis menjadi 'Diterima', tetap di tahap sebelumnya sampai HRD memutuskan di Status Kandidat
+        $this->assertNotEquals('Diterima', $this->lamaran->status_lamaran);
     }
 
     /**
@@ -385,6 +386,69 @@ class QATestCasesFase6Test extends TestCase
             'status_wawancara' => 'Terjadwal',
             'link_meeting'     => 'https://meet.google.com/test-baru',
         ]);
+    }
+
+    /**
+     * HRD 22: HRD mengunggah Surat Keputusan (SK) format PDF dan Pelamar dapat mengunduhnya
+     */
+    public function test_hrd22_upload_surat_keputusan_dan_download_pelamar()
+    {
+        Storage::fake('local');
+        $pdfSk = UploadedFile::fake()->create('surat_keputusan_resmi.pdf', 300, 'application/pdf');
+
+        $response = $this->actingAs($this->hrd, 'hrd')
+            ->post("/hrd/kandidat/{$this->lamaran->id_lamaran}/surat-keputusan", [
+                'file_sk' => $pdfSk,
+            ]);
+
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('dokumen_pelamar', [
+            'id_lamaran'    => $this->lamaran->id_lamaran,
+            'jenis_dokumen' => 'Surat Keputusan',
+        ]);
+
+        // Pelamar mengunduh Surat Keputusan yang baru diunggah
+        $downloadResponse = $this->actingAs($this->pelamarAktif, 'pelamar')
+            ->get("/pelamar/applications/{$this->lamaran->id_lamaran}/surat-keputusan");
+
+        $downloadResponse->assertOk();
+    }
+
+    /**
+     * Pelamar 9: Skor kecocokan CV kosong adalah 0%
+     */
+    public function test_pelamar9_skor_cv_kosong_adalah_nol()
+    {
+        Storage::fake('local');
+        $emptyPdf = UploadedFile::fake()->create('cv_kosong.pdf', 0, 'application/pdf');
+
+        $lowonganBaru = Lowongan::create([
+            'id_hrd' => $this->hrd->id_hrd,
+            'posisi' => 'DevOps Engineer',
+            'departemen' => 'Infrastructure',
+            'lokasi' => 'Remote',
+            'tipe_pekerjaan' => 'Full-Time',
+            'status_lowongan' => 'Aktif',
+            'gaji_min' => 12000000,
+            'gaji_max' => 18000000,
+            'tanggal_buka' => '2026-09-01',
+            'tanggal_tutup' => '2026-10-01',
+            'deskripsi' => 'Kubernetes, Docker, CI/CD pipelines.',
+            'kualifikasi' => 'AWS, Terraform, Linux administration.',
+        ]);
+
+        $this->actingAs($this->pelamarBaru, 'pelamar')
+            ->post("/pelamar/jobs/{$lowonganBaru->id_lowongan}/apply", [
+                'file_dokumen' => $emptyPdf,
+                'jenis_dokumen' => 'CV / Resume',
+            ]);
+
+        $lamaranBaru = Lamaran::where('id_pelamar', $this->pelamarBaru->id_pelamar)
+            ->where('id_lowongan', $lowonganBaru->id_lowongan)
+            ->first();
+
+        $this->assertNotNull($lamaranBaru);
+        $this->assertEquals(0.0, (float) $lamaranBaru->skor_kecocokan);
     }
 }
 

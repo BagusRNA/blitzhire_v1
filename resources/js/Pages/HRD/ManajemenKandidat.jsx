@@ -223,31 +223,34 @@ export default function ManajemenKandidat({ lamaran = [], confirmedInterviews = 
                             <span className="text-[10px]">▼</span>
                         </button>
                         {showTahapDropdown && (
-                            <div className="absolute left-0 mt-1 w-48 bg-white border border-gray-300 rounded shadow-lg z-20 py-1 text-xs">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setTahapFilter("Semua");
-                                        setShowTahapDropdown(false);
-                                    }}
-                                    className={`w-full text-left px-3 py-1.5 hover:bg-orange-50 hover:text-orange-600 transition ${tahapFilter === "Semua" ? "font-bold text-orange-600 bg-orange-50" : "text-gray-700"}`}
-                                >
-                                    Semua Tahap
-                                </button>
-                                {STATUS_COLUMNS.map((col) => (
+                            <>
+                                <div className="fixed inset-0 z-40" onClick={() => setShowTahapDropdown(false)} />
+                                <div className="absolute left-0 mt-1 w-52 bg-white border border-gray-300 rounded shadow-xl z-50 py-1 text-xs">
                                     <button
-                                        key={col.key}
                                         type="button"
                                         onClick={() => {
-                                            setTahapFilter(col.key);
+                                            setTahapFilter("Semua");
                                             setShowTahapDropdown(false);
                                         }}
-                                        className={`w-full text-left px-3 py-1.5 hover:bg-orange-50 hover:text-orange-600 transition ${tahapFilter === col.key ? "font-bold text-orange-600 bg-orange-50" : "text-gray-700"}`}
+                                        className={`w-full text-left px-3 py-1.5 hover:bg-orange-50 hover:text-orange-600 transition cursor-pointer ${tahapFilter === "Semua" ? "font-bold text-orange-600 bg-orange-50" : "text-gray-700"}`}
                                     >
-                                        {col.label}
+                                        Semua Tahap
                                     </button>
-                                ))}
-                            </div>
+                                    {STATUS_COLUMNS.map((col) => (
+                                        <button
+                                            key={col.key}
+                                            type="button"
+                                            onClick={() => {
+                                                setTahapFilter(col.key);
+                                                setShowTahapDropdown(false);
+                                            }}
+                                            className={`w-full text-left px-3 py-1.5 hover:bg-orange-50 hover:text-orange-600 transition cursor-pointer ${tahapFilter === col.key ? "font-bold text-orange-600 bg-orange-50" : "text-gray-700"}`}
+                                        >
+                                            {col.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </>
                         )}
                     </div>
 
@@ -256,7 +259,7 @@ export default function ManajemenKandidat({ lamaran = [], confirmedInterviews = 
                         <button
                             key={opt}
                             onClick={() => setFilterTipe(opt)}
-                            className={`hrd-filter-chip ${filterTipe === opt ? "hrd-filter-chip--active" : ""}`}
+                            className={`hrd-filter-chip ${filterTipe === opt ? "hrd-filter-chip--active !bg-orange-500 !border-orange-500 !text-white" : ""}`}
                         >
                             {opt}
                         </button>
@@ -315,9 +318,9 @@ export default function ManajemenKandidat({ lamaran = [], confirmedInterviews = 
                                                     {/* ATS badge */}
                                                     <div className="hrd-kcard-ats">
                                                         <span className="hrd-ats-badge-sm">
-                                                            {item.skor_kecocokan ??
-                                                                "—"}
-                                                            %
+                                                            {item.skor_kecocokan !== null && item.skor_kecocokan !== undefined
+                                                                ? `${Math.round(item.skor_kecocokan)}%`
+                                                                : "0%"}
                                                         </span>
                                                     </div>
 

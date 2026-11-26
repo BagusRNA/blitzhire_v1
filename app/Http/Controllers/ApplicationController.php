@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Lamaran;
 use App\Models\DokumenPelamar;
+use App\Services\ScoringService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -43,15 +44,15 @@ class ApplicationController extends Controller
             'id_lowongan' => $id_lowongan,
             'tanggal_lamaran' => now()->toDateString(),
             'status_lamaran' => 'Screening',
-            'skor_kecocokan' => null, // AI matching can be populated later
+            'skor_kecocokan' => 0.0,
         ]);
 
-        // 2. Handle Document Upload
+        // 2. Handle Document Upload & Scoring (HRD 18 & Pelamar 9)
         if ($request->hasFile('file_dokumen')) {
             $file = $request->file('file_dokumen');
             $fileName = time() . '_' . $file->getClientOriginalName();
             
-            // Store file securely in local storage (storage/app/private/cv or public)
+            // Store file securely
             $path = $file->storeAs('pelamar/dokumen', $fileName, 'local');
 
             DokumenPelamar::create([
@@ -61,6 +62,15 @@ class ApplicationController extends Controller
                 'path_file' => $path,
                 'tanggal_upload' => now()
             ]);
+
+            // Hitung skor kecocokan CV terhadap lowongan (ScoringService)
+            $scoringService = new ScoringService();
+            $fullFilePath = storage_path('app/' . $path);
+            if (!file_exists($fullFilePath)) {
+                $fullFilePath = $file->getRealPath();
+            }
+            $extractedText = $scoringService->extractTextFromPdf($fullFilePath);
+            $scoringService->calculateScore($lamaran, $extractedText);
         }
 
         return redirect()->route('pelamar.dashboard')->with('success', 'Application submitted successfully.');

@@ -185,7 +185,7 @@ export default function Dashboard({ lamarans, lamaran }) {
 
     const rescheduleInfo = parseRescheduleInfo(latestInterview?.catatan);
     const rejectionInfo = parseRejectionInfo(latestInterview?.catatan);
-    const isPendingReschedule = latestInterview?.status_wawancara === 'Ditunda' || Boolean(rescheduleInfo && latestInterview?.status_wawancara !== 'Selesai');
+    const isPendingReschedule = latestInterview?.status_wawancara === 'Ditunda';
     const isInterviewAccepted = latestInterview?.catatan?.includes('[Pelamar]: Telah mengonfirmasi kehadiran');
 
     // Helper to calculate stage display text and banners
@@ -267,6 +267,16 @@ export default function Dashboard({ lamarans, lamaran }) {
                     boxTitle: 'PENGAJUAN JADWAL ULANG WAWANCARA',
                     boxDesc: 'Silakan tentukan usulan tanggal dan jam baru jika Anda berhalangan hadir pada jadwal wawancara awal.',
                     isRescheduleState: true,
+                };
+            }
+
+            if (rejectionInfo) {
+                return {
+                    bannerTitle: 'TAHAP WAWANCARA',
+                    bannerBadge: 'JADWAL ULANG DITOLAK',
+                    boxTitle: 'PENGAJUAN JADWAL ULANG DITOLAK',
+                    boxDesc: `Pengajuan jadwal wawancara ulang Anda telah ditolak oleh HRD (Alasan: ${rejectionInfo}). Jadwal wawancara Anda tetap mengikuti jadwal yang tertera di bawah. Mohon menunggu tindakan HRD selanjutnya.`,
+                    interviewDone: false,
                 };
             }
 
@@ -976,18 +986,18 @@ export default function Dashboard({ lamarans, lamaran }) {
                                         ) : latestInterview ? (
                                             /* OPTION B: SCHEDULED (Image 3) OR COMPLETED (Image 2) */
                                             <>
-                                                {/* Rejection Alert from HRD if previous reschedule was rejected */}
+                                                {/* Rejection Alert from HRD if previous reschedule was rejected (Pelamar 11) */}
                                                 {rejectionInfo && (
-                                                    <div className="p-3 bg-red-50 border border-red-300 rounded text-xs text-red-900 leading-relaxed space-y-1">
-                                                        <div className="flex items-center gap-1.5 font-bold text-red-800">
+                                                    <div className="p-4 bg-red-50 border-2 border-red-400 rounded-lg text-xs text-red-900 leading-relaxed space-y-2 shadow-xs">
+                                                        <div className="flex items-center gap-2 font-bold text-red-800 text-sm">
                                                             <span>⚠️</span>
-                                                            <span>Pengajuan Jadwal Ulang Sebelumnya Ditolak HRD</span>
+                                                            <span>Notifikasi: Jadwal Wawancara yang Diajukan Ditolak oleh HRD</span>
                                                         </div>
-                                                        <p className="text-red-700">
-                                                            <strong>Alasan:</strong> {rejectionInfo}
+                                                        <p className="text-red-700 font-medium">
+                                                            <strong>Alasan Penolakan HRD:</strong> {rejectionInfo}
                                                         </p>
-                                                        <p className="text-[11px] text-gray-600">
-                                                            Jadwal wawancara Anda tetap mengikuti tanggal dan waktu yang tertera di bawah.
+                                                        <p className="text-[11px] text-gray-700 bg-white/70 p-2 rounded border border-red-200">
+                                                            Jadwal yang Anda ajukan telah ditolak. Silakan ikuti jadwal wawancara semula yang tertera di bawah dan menunggu tindakan atau instruksi HRD selanjutnya.
                                                         </p>
                                                     </div>
                                                 )}
