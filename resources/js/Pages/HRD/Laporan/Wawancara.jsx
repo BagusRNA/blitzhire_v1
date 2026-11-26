@@ -20,7 +20,16 @@ export default function LaporanWawancara({ laporan = [] }) {
 
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 print:p-0 print:bg-white text-gray-900">
-            <Head title="Laporan Jadwal Wawancara - BlitzHire" />
+            <Head title="Laporan Jadwal Wawancara - BlitzHire">
+                <style>{`
+                    @media print {
+                        @page { size: landscape; margin: 8mm; }
+                        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        table { width: 100% !important; }
+                        th, td { font-size: 11px !important; padding: 4px 6px !important; }
+                    }
+                `}</style>
+            </Head>
 
             {/* Top Toolbar (Hidden on print) */}
             <div className="max-w-6xl mx-auto mb-6 flex justify-between items-center print:hidden">

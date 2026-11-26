@@ -45,18 +45,17 @@ class PelamarController extends Controller
     }
 
     /**
-     * Reject Job Offer
+     * Reject Job Offer (IR24 / TC35)
      */
     public function rejectOffer(Request $request, $id_penawaran)
     {
         $penawaran = Penawaran::findOrFail($id_penawaran);
         
-        // Update Offer Status
+        // Update Offer Status (Pelamar menolak tawaran / mengajukan negosiasi)
         $penawaran->update(['status_penawaran' => 'Ditolak']);
 
-        // Update overall Application Status
-        $lamaran = Lamaran::findOrFail($penawaran->id_lamaran);
-        $lamaran->update(['status_lamaran' => 'Ditolak']);
+        // IR24: Status lamaran tidak otomatis di-reject/ditolak oleh sistem,
+        // melainkan tetap dipertimbangkan oleh HRD di tahap Penawaran.
 
         return back()->with('success', 'Negoisasi telah terkirim!');
     }
@@ -142,6 +141,10 @@ class PelamarController extends Controller
         $request->validate([
             'file_dokumen' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'jenis_dokumen' => 'required|string|max:100'
+        ], [
+            'file_dokumen.mimes' => 'Dokumen gagal diunggah! Format file tidak didukung.',
+            'file_dokumen.required' => 'Dokumen gagal diunggah!',
+            'file_dokumen.max' => 'Dokumen gagal diunggah! Ukuran melebihi 5MB.',
         ]);
 
         $lamaran = Lamaran::where('id_pelamar', auth('pelamar')->id())->findOrFail($id_lamaran);

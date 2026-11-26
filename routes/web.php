@@ -22,7 +22,7 @@ Route::get('/', function () {
         'stats' => $stats,
         'recentJobs' => $recentJobs
     ]);
-});
+})->name('landing');
 Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');
 Route::get('/jobs/{id_lowongan}', [JobController::class, 'show'])->name('jobs.show');
 

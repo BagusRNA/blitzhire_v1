@@ -173,6 +173,18 @@ export default function ManajemenKandidat({ lamaran = [], confirmedInterviews = 
         ? STATUS_COLUMNS
         : STATUS_COLUMNS.filter((col) => col.key === tahapFilter);
 
+    const offerAccepted = lamaran.filter((item) => {
+        if (!isOfferStatus(item.status_lamaran)) return false;
+        const latestOffer = item.penawaran?.[item.penawaran.length - 1];
+        return latestOffer?.status_penawaran === "Diterima";
+    });
+
+    const offerNegotiated = lamaran.filter((item) => {
+        if (!isOfferStatus(item.status_lamaran)) return false;
+        const latestOffer = item.penawaran?.[item.penawaran.length - 1];
+        return latestOffer?.status_penawaran === "Ditolak";
+    });
+
     return (
         <HRDLayout title="Manajemen Kandidat">
             <div className="hrd-page-section">
@@ -180,6 +192,58 @@ export default function ManajemenKandidat({ lamaran = [], confirmedInterviews = 
 
                 {flash?.success && (
                     <div className="hrd-flash-success">{flash.success}</div>
+                )}
+
+                {/* ── Notification Banner: Pelamar Menerima Penawaran (IR23 / TC34) ── */}
+                {offerAccepted.length > 0 && (
+                    <div className="bg-emerald-50 border-l-4 border-emerald-500 p-3 mb-4 rounded-r shadow-xs">
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-emerald-800 font-bold text-xs uppercase tracking-wide flex items-center gap-1.5">
+                                🔔 Penawaran Kerja Diterima Pelamar ({offerAccepted.length})
+                            </span>
+                        </div>
+                        <div className="space-y-1.5">
+                            {offerAccepted.map((item) => (
+                                <div key={item.id_lamaran} className="text-xs text-emerald-900 flex items-center justify-between">
+                                    <span>
+                                        <strong>{item.pelamar?.nama_lengkap}</strong> telah menerima penawaran kerja untuk posisi <em>{item.lowongan?.judul_lowongan || item.lowongan?.posisi}</em>.
+                                    </span>
+                                    <Link
+                                        href={route("hrd.kandidat.penawaran", item.id_lamaran)}
+                                        className="text-[11px] font-bold text-emerald-800 underline hover:text-emerald-950 ml-3 whitespace-nowrap"
+                                    >
+                                        Lihat Penawaran →
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* ── Notification Banner: Pelamar Mengajukan Negosiasi / Tolak Penawaran (IR24 / TC35) ── */}
+                {offerNegotiated.length > 0 && (
+                    <div className="bg-amber-50 border-l-4 border-amber-500 p-3 mb-4 rounded-r shadow-xs">
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-amber-900 font-bold text-xs uppercase tracking-wide flex items-center gap-1.5">
+                                💬 Negosiasi / Penolakan Penawaran ({offerNegotiated.length})
+                            </span>
+                        </div>
+                        <div className="space-y-1.5">
+                            {offerNegotiated.map((item) => (
+                                <div key={item.id_lamaran} className="text-xs text-amber-900 flex items-center justify-between">
+                                    <span>
+                                        <strong>{item.pelamar?.nama_lengkap}</strong> mengajukan negosiasi/penolakan atas penawaran posisi <em>{item.lowongan?.judul_lowongan || item.lowongan?.posisi}</em> (menunggu pertimbangan HRD).
+                                    </span>
+                                    <Link
+                                        href={route("hrd.kandidat.penawaran", item.id_lamaran)}
+                                        className="text-[11px] font-bold text-amber-900 underline hover:text-amber-950 ml-3 whitespace-nowrap"
+                                    >
+                                        Tinjau Penawaran →
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 )}
 
                 {/* ── Notification Banner: Pelamar Menerima Jadwal Wawancara (HRD 9) ── */}
@@ -353,7 +417,7 @@ export default function ManajemenKandidat({ lamaran = [], confirmedInterviews = 
                                                           "Penawaran" ? (
                                                             <span className="hrd-kcard-meta">
                                                                 {item
-                                                                    .penawaran?.[0]
+                                                                    .penawaran?.[item.penawaran.length - 1]
                                                                     ?.status_penawaran ??
                                                                     "Offered"}
                                                             </span>

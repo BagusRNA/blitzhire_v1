@@ -163,6 +163,7 @@ class QATestCasesFase6Test extends TestCase
 
     /**
      * IR24 / TC35: Pelamar menolak penawaran kerja dengan alasan/negosiasi
+     * Pelamar tidak otomatis di-auto-reject oleh sistem, melainkan tetap di tahap penawaran.
      */
     public function test_tc35_pelamar_menolak_penawaran_kerja_dengan_alasan()
     {
@@ -177,7 +178,8 @@ class QATestCasesFase6Test extends TestCase
         $this->penawaran->refresh();
         $this->lamaran->refresh();
         $this->assertEquals('Ditolak', $this->penawaran->status_penawaran);
-        $this->assertEquals('Ditolak', $this->lamaran->status_lamaran);
+        // IR24: Status lamaran tidak otomatis 'Ditolak' oleh sistem tanpa pertimbangan HRD
+        $this->assertNotEquals('Ditolak', $this->lamaran->status_lamaran);
     }
 
     /**
@@ -449,6 +451,36 @@ class QATestCasesFase6Test extends TestCase
 
         $this->assertNotNull($lamaranBaru);
         $this->assertEquals(0.0, (float) $lamaranBaru->skor_kecocokan);
+    }
+
+    /**
+     * TC37: Pelamar mengunggah dokumen tambahan dengan format tidak valid
+     */
+    public function test_tc37_upload_dokumen_tidak_valid_ditolak()
+    {
+        Storage::fake('local');
+        $txtFile = UploadedFile::fake()->create('dokumen_rahasia.exe', 100);
+
+        $response = $this->actingAs($this->pelamarAktif, 'pelamar')
+            ->post("/pelamar/applications/{$this->lamaran->id_lamaran}/documents", [
+                'file_dokumen' => $txtFile,
+                'jenis_dokumen' => 'KTP',
+            ]);
+
+        $response->assertSessionHasErrors(['file_dokumen']);
+    }
+
+    /**
+     * TC48 (Pelamar) / TC28 (HRD): Pelamar mencoba mengakses Dashboard Admin
+     * Sistem menolak akses, menampilkan pesan error "Anda tidak memiliki hak akses!", dan mengarahkan ke Landing Page
+     */
+    public function test_tc48_pelamar_akses_dashboard_admin_ditolak()
+    {
+        $response = $this->actingAs($this->pelamarAktif, 'pelamar')
+            ->get('/hrd/dashboard');
+
+        $response->assertRedirect(route('landing'));
+        $response->assertSessionHas('error', 'Anda tidak memiliki hak akses!');
     }
 }
 

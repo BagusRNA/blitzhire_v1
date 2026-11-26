@@ -1,9 +1,11 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import Header from '@/Components/Header';
 import Footer from '@/Components/Footer';
 
 export default function LandingPage({ stats = {}, recentJobs = [] }) {
+    const { flash } = usePage().props;
+
     return (
         <div className="landing-wrapper">
             <Head title="Careers — Cybers Blitz Nusantara" />
@@ -12,6 +14,19 @@ export default function LandingPage({ stats = {}, recentJobs = [] }) {
             <Header />
 
             <main className="landing-main">
+                {/* Flash Error Banner (TC28 / TC48 Access Denial) */}
+                {flash?.error && (
+                    <div className="max-w-6xl mx-auto my-4 px-4">
+                        <div className="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-md flex items-center justify-between text-sm font-semibold shadow-xs">
+                            <div className="flex items-center gap-2">
+                                <svg className="w-5 h-5 text-red-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                </svg>
+                                <span>{flash.error}</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 {/* 1. Hero Section */}
                 <section className="landing-hero-section">
                     <div className="landing-hero-grid">

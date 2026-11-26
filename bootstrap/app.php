@@ -17,7 +17,25 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        //
+        $middleware->redirectGuestsTo(function (Request $request) {
+            if ($request->is('hrd*')) {
+                if (auth('pelamar')->check()) {
+                    session()->flash('error', 'Anda tidak memiliki hak akses!');
+                    return route('landing');
+                }
+                return route('hrd.auth.showLogin');
+            }
+
+            if ($request->is('pelamar*')) {
+                if (auth('hrd')->check()) {
+                    session()->flash('error', 'Anda tidak memiliki hak akses!');
+                    return route('landing');
+                }
+                return route('pelamar.auth.showLogin');
+            }
+
+            return route('login');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

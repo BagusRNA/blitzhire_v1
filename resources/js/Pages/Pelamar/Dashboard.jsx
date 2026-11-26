@@ -450,7 +450,13 @@ export default function Dashboard({ lamarans, lamaran }) {
         formData.append('file_dokumen', uploadModal.file);
 
         router.post(`/pelamar/applications/${uploadModal.lamaranId}/documents`, formData, {
-            onSuccess: () => setUploadModal({ open: false, lamaranId: null, docType: 'KTP', file: null })
+            onSuccess: () => {
+                setUploadModal({ open: false, lamaranId: null, docType: 'KTP', file: null });
+                alert('Dokumen berhasil diunggah!');
+            },
+            onError: (err) => {
+                alert('Dokumen gagal diunggah!');
+            }
         });
     };
 
